@@ -124,6 +124,85 @@ def strip_stats_eff(table_1, table_2):
     
     return df
 
+def soup_table_rb(url, season):
+    """
+    scraper for running back that generates several rb stats table from
+    https://www.footballoutsiders.com/stats/rb
+    """
+
+    rank_rush = []
+    unrank_rush = []
+    rank_rec = []
+    unrank_rec = []
+
+
+    tb = url.find("table", class_ = "stats")
+    for tb in url.find_all('tr'):
+        tds = tb.find_all('td')
+        if tds == []:
+            continue
+        row = []
+        for i in tds:
+            if "%" in i.text:
+                # convert percentage strings to floats
+                try:
+                    row.append(float(i.text.strip("%")) / 100)
+                except:
+                    row.append("")
+            else:
+                try:
+                    row.append(float(i.text))
+                except:
+                    row.append(i.text)
+
+        #new_table_1.append(row + [season, stat_type])
+
+        if (row != [] and row[0] != ""):
+            # RUSHING: Ranked RunningBacks
+            if len(row) == 16:
+                if (row[0] != "Player"):
+                    rank_rush.append(row + [season])
+                else:
+                    rank_rush_col = row 
+                
+            # RUSHING: Unranked RB
+            elif (len(row) == 11):
+                if (row[0] != "Player"):
+                    unrank_rush.append(row+ [season])
+                else:
+                    unrank_rush_col = row
+
+            # RECEIVING: Ranked RB
+            elif (len(row) == 15):
+                if (row[0] != "Player"):
+                    rank_rec.append(row + [season])
+                else:
+                    rank_rec_col = row
+
+            # RECEIVING: Unranked RB
+            elif (len(row) == 12):
+                if (row[0] != "Player"):
+                    unrank_rec.append(row + [season])
+                else:
+                    unrank_rec_col = row
+
+            else:
+                print('Error')   
+                
+    rb_rush_df = pd.DataFrame(rank_rush)
+    rb_rush_df.columns = rank_rush_col + ['season']
+    
+    rb_rush_unranked_df = pd.DataFrame(unrank_rush)
+    rb_rush_unranked_df.columns = unrank_rush_col+ ['season']
+    
+    rb_rec_df = pd.DataFrame(rank_rec)
+    rb_rec_df.columns = rank_rec_col + ['season']
+    
+    rb_rec_unranked_df = pd.DataFrame(unrank_rec)
+    rb_rec_unranked_df.columns = unrank_rec_col + ['season']
+    
+    return rb_rush_df, rb_rush_unranked_df, rb_rec_df, rb_rec_unranked_df
+
 def make_table(yr_range, stat_type):   
     urls = set_url(yr_range, stat_type)
     print(urls)
@@ -137,6 +216,31 @@ def make_table(yr_range, stat_type):
             table = soup_table_eff(soup, season)
             df[season] = pd.DataFrame(table)
         new_df = pd.concat(df.values())
+        
+        return new_df
+    
+    elif stat_type == 'rb':
+        rb_rush_df = {}
+        rb_rush_unranked_df = {}
+        rb_rec_df = {}
+        rb_rec_unranked_df = {}
+        for url in urls:
+            season = url[-4:]
+            print(season)
+            soup = grab_data(url)
+            rb_rush_tb, rb_rush_unranked_tb, rb_rec_tb, rb_rec_unranked_tb = soup_table_rb(soup, season)
+            
+            rb_rush_df[season] = pd.DataFrame(rb_rush_tb)
+            rb_rush_unranked_df[season] = pd.DataFrame(rb_rush_unranked_tb)
+            rb_rec_df[season] = pd.DataFrame(rb_rec_tb)
+            rb_rec_unranked_df[season] = pd.DataFrame(rb_rec_unranked_tb)
+        
+        rb_rush_df = pd.concat(rb_rush_df.values())
+        rb_rush_unranked_df = pd.concat(rb_rush_unranked_df.values())
+        rb_rec_df = pd.concat(rb_rec_df.values())
+        rb_rec_unranked_df = pd.concat(rb_rec_unranked_df.values())
+        
+        return rb_rush_df, rb_rush_unranked_df, rb_rec_df, rb_rec_unranked_df
     
     elif stat_type == 'teamoff':
         df = {}
@@ -148,5 +252,4 @@ def make_table(yr_range, stat_type):
             df[season] = pd.DataFrame(table, columns=define_col_name(stat_type))
         new_df = pd.concat(df.values())
         
-        
-    return new_df
+        return new_df
