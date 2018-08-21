@@ -40,7 +40,8 @@ for xml_doc in documents:
     except:
         continue
         
-
+# set of task to freate a new datafraom with the necessary 
+# .. columns. 
 news_data = pd.DataFrame(title_list, columns=["title"])
 news_data["category"] = category_list
 news_data["description"] = description_list
