@@ -55,3 +55,24 @@ List keys:  dict_keys(['url', 'date', 'title', 'keywords', 'text'])
 List keywords ['thing', 'mock', 'hit', 'midpreseason', 'followed', 'watch', 'seahawks', 'vs', 'draft', '3000', 'thats', 'rob', 'weeks', 'nfl', 'vikings', 'twitter']
 -------------------------------------------------------------------------------
 """
+
+
+# Save to json
+import json
+def save_to_json(doc, label):
+    doc = json.dumps(doc, indent=4, sort_keys=True, default=str)
+    with open(label+'_news.json', 'w') as outfile:
+        json.dump(doc, outfile)
+
+doc = {
+    'hawks':hawks
+    }
+
+[save_to_json(doc[y], y) for x,y in enumerate(doc)]
+        
+# Open json
+from pprint import pprint
+with open('hawks_news.json', encoding='utf-8') as f:
+    df = json.load(f)
+df = json.loads(df)
+       
