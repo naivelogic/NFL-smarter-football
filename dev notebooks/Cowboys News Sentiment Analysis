@@ -1,0 +1,306 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Cowboys News Topic Modeling"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import json\n",
+    "from pprint import pprint\n",
+    "\n",
+    "with open('cowboy_news.json', encoding='utf-8') as f:\n",
+    "    df = json.load(f)\n",
+    "df = json.loads(df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'date': '2018-08-22 00:00:00',\n",
+       " 'keywords': ['frederick',\n",
+       "  'treatments',\n",
+       "  'cowboys',\n",
+       "  'youre',\n",
+       "  'dallas',\n",
+       "  'game',\n",
+       "  'field',\n",
+       "  'reveals',\n",
+       "  'center',\n",
+       "  'disease',\n",
+       "  'timetable',\n",
+       "  'hes',\n",
+       "  'jones',\n",
+       "  'travis',\n",
+       "  'return',\n",
+       "  'spine',\n",
+       "  'rare'],\n",
+       " 'text': 'Dallas Cowboys center Travis Frederick is seen during the afternoon practice at the training camp in Oxnard, Calif., Saturday, Aug. 4, 2018. (Jae S. Lee/The Dallas Morning News)\\n\\n\"In the last 48 hours, I have received two treatments that address my condition, and I am feeling much better from an overall strength perspective,\" Frederick said in the statement. \"I will continue these treatments over the next few days. I am very optimistic about my condition and the immediate future, as I have been told that the illness was detected at a fairly early stage.\"\\n\\nThe Cowboys\\' All-Pro center released a statement Wednesday revealing that he has been diagnosed with Guillain-Barre Syndrome, a rare auto-immune disease that causes the body\\'s immune system to attack its nerves.\\n\\nAn update on what’s going on with me: pic.twitter.com/KSkMUvyCWk\\n\\nFrederick added that his doctors have said it\\'s currently not possible to determine when he will be able to return to the field. According to the Mayo Clinic, there\\'s no known cure for Guillain-Barre syndrome, but several treatments can ease symptoms and reduce the duration of the illness.\\n\\n\"I am deeply grateful for all of the people who have expressed concern for me throughout the past four weeks,\" Frederick said, \"and my teammates and the Cowboys organization have provided me and my family with tremendous support.\"\\n\\nFrederick hasn\\'t practiced in over a week while dealing with what he thought were stingers in his neck, something that is not uncommon for football players to experience. He described the feeling as sometimes a shooting pain and other times a burning sensation that caused him to lose some strength.\\n\\nWhile the team was in Southern California for training camp last week, Frederick was examined by Dr. Robert Watkins III, a board-certified orthopedic spine surgeon and co-director of the Marina Spine Clinic in Marina Del Rey, Calif.\\n\\nFollowing the visit, Frederick said he was assured the stingers were his only issue and they could be addressed with rest.\\n\\nHowever, after the team returned to Dallas, sources said Frederick sought additional opinions to determine if rest was the best option or if surgery needed to be considered.\\n\\nSources said orthopedic surgeon Dr. Andrew Dossett, a spine consultant for the Cowboys, Texas Rangers and Dallas Stars, saw Frederick on Saturday evening at AT&T Stadium before the team\\'s preseason game with Cincinnati.\\n\\nWhile meeting with reporters Wednesday morning, Cowboys executive vice president Stephen Jones said some news could be coming regarding Frederick\\'s health later in the day. Jones added that Frederick was still experiencing symptoms.\\n\\n\"Any time you\\'re talking about these kinds of things, you\\'re concerned,\" Jones said. \"You want to get it right. Player safety is most important. Until we find out exactly what\\'s causing some of the symptoms that are making him uncomfortable then we\\'re going to uncover every stone until we do that.\"\\n\\nFrederick, a first-round pick in 2013, has started every game at center for the Cowboys over the last five seasons. He was named first-team All-Pro in 2016 and second-team in 2014 and 2015. Frederick has also been selected to the last four Pro Bowls.\\n\\nVeteran offensive lineman Joe Looney has been Frederick\\'s backup the last two seasons. He started in place of Frederick in Saturday\\'s preseason game and will likely remain the starter until Frederick is able to return.\\n\\n\"You can\\'t replace a guy like Travis Frederick,\" Looney said. \"He\\'s a wonderful football player, but more importantly he\\'s a wonderful guy. I\\'m just trying to come out here and work as hard as he did and keep this thing rolling.\\n\\n\"At the end of the day, we\\'re all human. He\\'s got kids and you want him to be healthy. I\\'m definitely checking up on him, making sure he\\'s good.\"',\n",
+       " 'title': 'Dallas Cowboys: Cowboys C Travis Frederick reveals he has a rare autoimmune disease; no timetable for return to field',\n",
+       " 'url': 'https://sportsday.dallasnews.com/dallas-cowboys/cowboys/2018/08/22/cowboys-c-travis-frederick-says-statement-auto-immune-disease-no-timetable-return-field'}"
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df[0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import re\n",
+    "\n",
+    "def preprocess_post(post):\n",
+    "    post = post.lower()\n",
+    "    post = re.sub('\\n', ' ', post)\n",
+    "    post = re.sub(r'[^\\w\\s]','',post)\n",
+    "    \n",
+    "    return post"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sent = []\n",
+    "for post in df:\n",
+    "    k = preprocess_post(post['text'])\n",
+    "    sent.append(k)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "'dallas cowboys center travis frederick is seen during the afternoon practice at the training camp in oxnard calif saturday aug 4 2018 jae s leethe dallas morning news  in the last 48 hours i have received two treatments that address my condition and i am feeling much better from an overall strength perspective frederick said in the statement i will continue these treatments over the next few days i am very optimistic about my condition and the immediate future as i have been told that the illness was detected at a fairly early stage  the cowboys allpro center released a statement wednesday revealing that he has been diagnosed with guillainbarre syndrome a rare autoimmune disease that causes the bodys immune system to attack its nerves  an update on whats going on with me pictwittercomkskmuvycwk  frederick added that his doctors have said its currently not possible to determine when he will be able to return to the field according to the mayo clinic theres no known cure for guillainbarre syndrome but several treatments can ease symptoms and reduce the duration of the illness  i am deeply grateful for all of the people who have expressed concern for me throughout the past four weeks frederick said and my teammates and the cowboys organization have provided me and my family with tremendous support  frederick hasnt practiced in over a week while dealing with what he thought were stingers in his neck something that is not uncommon for football players to experience he described the feeling as sometimes a shooting pain and other times a burning sensation that caused him to lose some strength  while the team was in southern california for training camp last week frederick was examined by dr robert watkins iii a boardcertified orthopedic spine surgeon and codirector of the marina spine clinic in marina del rey calif  following the visit frederick said he was assured the stingers were his only issue and they could be addressed with rest  however after the team returned to dallas sources said frederick sought additional opinions to determine if rest was the best option or if surgery needed to be considered  sources said orthopedic surgeon dr andrew dossett a spine consultant for the cowboys texas rangers and dallas stars saw frederick on saturday evening at att stadium before the teams preseason game with cincinnati  while meeting with reporters wednesday morning cowboys executive vice president stephen jones said some news could be coming regarding fredericks health later in the day jones added that frederick was still experiencing symptoms  any time youre talking about these kinds of things youre concerned jones said you want to get it right player safety is most important until we find out exactly whats causing some of the symptoms that are making him uncomfortable then were going to uncover every stone until we do that  frederick a firstround pick in 2013 has started every game at center for the cowboys over the last five seasons he was named firstteam allpro in 2016 and secondteam in 2014 and 2015 frederick has also been selected to the last four pro bowls  veteran offensive lineman joe looney has been fredericks backup the last two seasons he started in place of frederick in saturdays preseason game and will likely remain the starter until frederick is able to return  you cant replace a guy like travis frederick looney said hes a wonderful football player but more importantly hes a wonderful guy im just trying to come out here and work as hard as he did and keep this thing rolling  at the end of the day were all human hes got kids and you want him to be healthy im definitely checking up on him making sure hes good'"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "sent[0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "31"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(sent)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tx = sent[:25] # train\n",
+    "tex = sent[26:] # test"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from sklearn.feature_extraction.text import CountVectorizer\n",
+    "\n",
+    "cv = CountVectorizer(binary=True)\n",
+    "cv.fit(tx)\n",
+    "X = cv.transform(tx)\n",
+    "X_test = cv.transform(tex)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Accuracy for C=0.01: 0.714285714286\n",
+      "Accuracy for C=0.05: 0.714285714286\n",
+      "Accuracy for C=0.25: 0.714285714286\n",
+      "Accuracy for C=0.5: 0.714285714286\n",
+      "Accuracy for C=1: 0.857142857143\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/home/redne/anaconda3/lib/python3.6/site-packages/sklearn/model_selection/_split.py:2026: FutureWarning: From version 0.21, test_size will always complement train_size unless both are specified.\n",
+      "  FutureWarning)\n"
+     ]
+    }
+   ],
+   "source": [
+    "from sklearn.linear_model import LogisticRegression\n",
+    "from sklearn.metrics import accuracy_score\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "\n",
+    "target = [1 if i < 15 else 0 for i in range(25)]\n",
+    "\n",
+    "X_train, X_val, y_train, y_val = train_test_split(\n",
+    "    X, target, train_size = 0.75)\n",
+    "\n",
+    "for c in [0.01, 0.05, 0.25, 0.5, 1]:\n",
+    "    \n",
+    "    lr = LogisticRegression(C=c)\n",
+    "    lr.fit(X_train, y_train)\n",
+    "    print (\"Accuracy for C=%s: %s\" \n",
+    "           % (c, accuracy_score(y_val, lr.predict(X_val))))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "LogisticRegression(C=0.05, class_weight=None, dual=False, fit_intercept=True,\n",
+       "          intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=1,\n",
+       "          penalty='l2', random_state=None, solver='liblinear', tol=0.0001,\n",
+       "          verbose=0, warm_start=False)"
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "final_model = LogisticRegression(C=0.05)\n",
+    "final_model.fit(X, target)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "('said', 0.06780972645426632)\n",
+      "('2018', 0.047760845099973664)\n",
+      "('take', 0.043781333260431959)\n",
+      "('back', 0.04258163393106839)\n",
+      "('news', 0.042354947157079235)\n"
+     ]
+    }
+   ],
+   "source": [
+    "feature_to_coef = {\n",
+    "    word: coef for word, coef in zip(\n",
+    "        cv.get_feature_names(), final_model.coef_[0]\n",
+    "    )\n",
+    "}\n",
+    "for best_positive in sorted(\n",
+    "    feature_to_coef.items(), \n",
+    "    key=lambda x: x[1], \n",
+    "    reverse=True)[:5]:\n",
+    "    print (best_positive)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "('see', -0.047914852203324282)\n",
+      "('follow', -0.040716677374939211)\n",
+      "('video', -0.040657776328493496)\n",
+      "('well', -0.036820027417992333)\n",
+      "('too', -0.035762820851556409)\n"
+     ]
+    }
+   ],
+   "source": [
+    "for best_negative in sorted(\n",
+    "    feature_to_coef.items(), \n",
+    "    key=lambda x: x[1])[:5]:\n",
+    "    print (best_negative)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
