@@ -56,6 +56,28 @@ List keywords ['thing', 'mock', 'hit', 'midpreseason', 'followed', 'watch', 'sea
 -------------------------------------------------------------------------------
 """
 
+# Get Transcripts from youtube videos
+from youtube_transcript_api import YouTubeTranscriptApi
+def youtube_scraper(url_string):
+    urls = feedparser.parse(url_string)
+    pat_urls = []
+    for url in urls['entries']:
+        x = url['links'][0]['href']
+        pat_urls.append(x)
+    
+    
+    newsy_urls = []
+    for youtube_url in pat_urls:
+        youtube = YouTubeTranscriptApi.get_transcript(youtube_url[32:])
+        transcripts = []
+        [transcripts.append(vid['text']) for vid in youtube if vid['text'] != '[Music]' and vid['text'] != '[Applause]']
+        newsy_urls.append(transcripts)
+    
+
+    return newsy_urls
+
+# nfl_youtube = youtube_scraper('https://www.youtube.com/feeds/videos.xml?user=NFL')
+
 
 # Save to json
 import json
@@ -64,11 +86,9 @@ def save_to_json(doc, label):
     with open(label+'_news.json', 'w') as outfile:
         json.dump(doc, outfile)
 
-doc = {
-    'hawks':hawks
-    }
+#doc = {'hawks':hawks }
 
-[save_to_json(doc[y], y) for x,y in enumerate(doc)]
+#[save_to_json(doc[y], y) for x,y in enumerate(doc)]
         
 # Open json
 import pandas as pd
