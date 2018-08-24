@@ -71,8 +71,37 @@ doc = {
 [save_to_json(doc[y], y) for x,y in enumerate(doc)]
         
 # Open json
+import pandas as pd
+import json
 from pprint import pprint
-with open('hawks_news.json', encoding='utf-8') as f:
-    df = json.load(f)
-df = json.loads(df)
-       
+def open_new_json(doc):
+    with open(doc+'_news.json', encoding='utf-8') as f:
+        dat = json.load(f)
+    dat = json.loads(dat)
+    df = pd.DataFrame(dat)
+    df['team'] = doc
+    
+    return df
+
+
+document =[
+    'hawks',
+    'patriots',
+    'steelers',
+    'cheese',
+    'panthers',
+    'cardinals',
+    'cowboys'
+]
+
+def open_json():
+    df = {}
+    for doc in document:
+        df[doc] = open_json(doc)
+    nfl = pd.concat(df.values())
+    
+    nfl = nfl.drop_duplicates(subset='text').reset_index(drop=True)
+    nfl['date'] = pd.to_datetime(nfl['date'], format="%Y%m%d %H:%M:%S").dt.date
+    nfl['day'] =  pd.to_datetime(nfl['date']).dt.day
+    
+    return nfl
