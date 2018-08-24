@@ -1,0 +1,1301 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![](https://3qeqpr26caki16dnhd19sv6by6v-wpengine.netdna-ssl.com/wp-content/uploads/2016/08/Text-Generation-With-LSTM-Recurrent-Neural-Networks-in-Python-with-Keras.jpg)\n",
+    "\n",
+    "Thanks for the help [DF Sarkar](https://towardsdatascience.com/a-practitioners-guide-to-natural-language-processing-part-i-processing-understanding-text-9f4abfd13e72)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "doc =[\n",
+    "    'hawks',\n",
+    "    'patriots',\n",
+    "    'steelers',\n",
+    "    'cheese',\n",
+    "    'panthers',\n",
+    "    'cardinals'\n",
+    "    \n",
+    "]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import json\n",
+    "def open_json(label):\n",
+    "    doc = json.dumps(doc, indent=4, sort_keys=True, default=str)\n",
+    "    with open(label+'_news.json', 'w') as outfile:\n",
+    "        json.dump(doc, outfile)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import json\n",
+    "from pprint import pprint\n",
+    "def open_json(doc):\n",
+    "    with open(doc+'_news.json', encoding='utf-8') as f:\n",
+    "        doc = json.load(f)\n",
+    "    doc = json.loads(doc)\n",
+    "    return doc"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# [open_json(x) for x in doc]\n",
+    "hawks = open_json('hawks')\n",
+    "patriots = open_json('patriots')\n",
+    "steelers = open_json('steelers')\n",
+    "cheese = open_json('cheese')\n",
+    "panthers = open_json('panthers')\n",
+    "cardinals = open_json('cardinals')\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'date': '2018-08-22 00:00:00',\n",
+       " 'keywords': ['thing',\n",
+       "  'mock',\n",
+       "  'hit',\n",
+       "  'midpreseason',\n",
+       "  'followed',\n",
+       "  'watch',\n",
+       "  'seahawks',\n",
+       "  'vs',\n",
+       "  'draft',\n",
+       "  '3000',\n",
+       "  'thats',\n",
+       "  'rob',\n",
+       "  'weeks',\n",
+       "  'nfl',\n",
+       "  'vikings',\n",
+       "  'twitter'],\n",
+       " 'text': 'A new episode of 3000 NFL Mock Draft: A Seahawks Podcast!\\n\\nMe and Rob discuss Seattle’s loss to the Chargers, Germain Ifedi vs George Fant, Rasheem’s Green rapid development at defensive end, and more. Then go into what to expect in the next two preseason games, while Rob answers some quick-hit questions from me about who will make the team and whether that’s a good thing or a bad thing. Followed by some players to watch in next week’s NCAA opening schedule.\\n\\nThe Seahawks play the Minnesota Vikings on Friday at 5 PM PST, followed by the finale next Thursday against Marshawn Lynch and the Raiders.\\n\\nIf you like the show and want to support it, please consider donating to the Patreon. Follow Field Gulls on Twitter and Facebook. Rob on Twitter and a link to SeahawksDraftBlog.\\n\\nSubscribe to the show on iTunes by searching for Seaside Chats with Kenneth Arthur!',\n",
+       " 'title': '3000 NFL Mock Draft: Seahawks hit midpreseason',\n",
+       " 'url': 'https://www.fieldgulls.com/2018/8/22/17772216/3000-nfl-mock-draft-seahawks-hit-midpreseason-podcast-chargers-vikings-preview-nfl'}"
+      ]
+     },
+     "execution_count": 24,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "hawks[0]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Build Dataset"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "doc =[\n",
+    "    'hawks',\n",
+    "    'patriots',\n",
+    "    'steelers',\n",
+    "    'cheese',\n",
+    "    'panthers',\n",
+    "    'cardinals'\n",
+    "    \n",
+    "]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hawks_df = pd.DataFrame(hawks)\n",
+    "hawks_df['team'] = 'seahawks'\n",
+    "df['seahawks'] = hawks_df\n",
+    "\n",
+    "patriots_df = pd.DataFrame(patriots)\n",
+    "patriots_df['team'] = 'patriots'\n",
+    "df['patriots'] = patriots_df\n",
+    "\n",
+    "steelers_df = pd.DataFrame(steelers)\n",
+    "steelers_df['team'] = 'steelers'\n",
+    "df['steelers'] = steelers_df\n",
+    "\n",
+    "cheese_df = pd.DataFrame(cheese)\n",
+    "cheese_df['team'] = 'cheese'\n",
+    "df['cheese'] = cheese_df\n",
+    "\n",
+    "panthers_df = pd.DataFrame(panthers)\n",
+    "panthers_df['team'] = 'panthers'\n",
+    "df['panthers'] = panthers_df\n",
+    "\n",
+    "cardinals_df = pd.DataFrame(cardinals)\n",
+    "cardinals_df['team'] = 'cardinals'\n",
+    "df['cardinals'] = cardinals_df\n",
+    "\n",
+    "new_df = pd.concat(df.values())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style>\n",
+       "    .dataframe thead tr:only-child th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: left;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>date</th>\n",
+       "      <th>keywords</th>\n",
+       "      <th>text</th>\n",
+       "      <th>title</th>\n",
+       "      <th>url</th>\n",
+       "      <th>team</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>2018-08-22 00:00:00</td>\n",
+       "      <td>[thing, mock, hit, midpreseason, followed, wat...</td>\n",
+       "      <td>A new episode of 3000 NFL Mock Draft: A Seahaw...</td>\n",
+       "      <td>3000 NFL Mock Draft: Seahawks hit midpreseason</td>\n",
+       "      <td>https://www.fieldgulls.com/2018/8/22/17772216/...</td>\n",
+       "      <td>seahawks</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2018-08-22 00:00:00</td>\n",
+       "      <td>[season, know, 2018, good, nfl, game, wont, zo...</td>\n",
+       "      <td>The Seahawks knew they wouldn’t need Nick Vann...</td>\n",
+       "      <td>NFL breakout players 2018: Seahawks have a new...</td>\n",
+       "      <td>https://www.sbnation.com/nfl/2018/8/22/1765323...</td>\n",
+       "      <td>seahawks</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2018-08-22 00:00:00</td>\n",
+       "      <td>[season, know, 2018, good, nfl, game, wont, zo...</td>\n",
+       "      <td>The Seahawks knew they wouldn’t need Nick Vann...</td>\n",
+       "      <td>NFL breakout players 2018: Seahawks have a new...</td>\n",
+       "      <td>https://www.sbnation.com/nfl/2018/8/22/1765323...</td>\n",
+       "      <td>seahawks</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>2018-08-22 00:00:00</td>\n",
+       "      <td>[tape, seattle, play, darrell, bevell, defensi...</td>\n",
+       "      <td>There’s excitement and intrigue surrounding th...</td>\n",
+       "      <td>Seahawks on tape: Seattle’s offense should kee...</td>\n",
+       "      <td>https://www.fieldgulls.com/2018/8/22/17770004/...</td>\n",
+       "      <td>seahawks</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>2018-08-22 00:00:00</td>\n",
+       "      <td>[tape, seattle, play, darrell, bevell, defensi...</td>\n",
+       "      <td>There’s excitement and intrigue surrounding th...</td>\n",
+       "      <td>Seahawks on tape: Seattle’s offense should kee...</td>\n",
+       "      <td>https://www.fieldgulls.com/2018/8/22/17770004/...</td>\n",
+       "      <td>seahawks</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                  date                                           keywords  \\\n",
+       "0  2018-08-22 00:00:00  [thing, mock, hit, midpreseason, followed, wat...   \n",
+       "1  2018-08-22 00:00:00  [season, know, 2018, good, nfl, game, wont, zo...   \n",
+       "2  2018-08-22 00:00:00  [season, know, 2018, good, nfl, game, wont, zo...   \n",
+       "3  2018-08-22 00:00:00  [tape, seattle, play, darrell, bevell, defensi...   \n",
+       "4  2018-08-22 00:00:00  [tape, seattle, play, darrell, bevell, defensi...   \n",
+       "\n",
+       "                                                text  \\\n",
+       "0  A new episode of 3000 NFL Mock Draft: A Seahaw...   \n",
+       "1  The Seahawks knew they wouldn’t need Nick Vann...   \n",
+       "2  The Seahawks knew they wouldn’t need Nick Vann...   \n",
+       "3  There’s excitement and intrigue surrounding th...   \n",
+       "4  There’s excitement and intrigue surrounding th...   \n",
+       "\n",
+       "                                               title  \\\n",
+       "0     3000 NFL Mock Draft: Seahawks hit midpreseason   \n",
+       "1  NFL breakout players 2018: Seahawks have a new...   \n",
+       "2  NFL breakout players 2018: Seahawks have a new...   \n",
+       "3  Seahawks on tape: Seattle’s offense should kee...   \n",
+       "4  Seahawks on tape: Seattle’s offense should kee...   \n",
+       "\n",
+       "                                                 url      team  \n",
+       "0  https://www.fieldgulls.com/2018/8/22/17772216/...  seahawks  \n",
+       "1  https://www.sbnation.com/nfl/2018/8/22/1765323...  seahawks  \n",
+       "2  https://www.sbnation.com/nfl/2018/8/22/1765323...  seahawks  \n",
+       "3  https://www.fieldgulls.com/2018/8/22/17770004/...  seahawks  \n",
+       "4  https://www.fieldgulls.com/2018/8/22/17770004/...  seahawks  "
+      ]
+     },
+     "execution_count": 53,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "new_df.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "remove duplicate articles"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 159,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "nfl = new_df.drop_duplicates(subset='text')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "searching for keywords"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 167,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style>\n",
+       "    .dataframe thead tr:only-child th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: left;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>date</th>\n",
+       "      <th>keywords</th>\n",
+       "      <th>text</th>\n",
+       "      <th>title</th>\n",
+       "      <th>url</th>\n",
+       "      <th>team</th>\n",
+       "      <th>clean_text</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>127</th>\n",
+       "      <td>2018-08-22 00:00:00</td>\n",
+       "      <td>[makes, way, happen, sign, thinks, think, rout...</td>\n",
+       "      <td>The Patriots should sign Dez Bryant. It couldn...</td>\n",
+       "      <td>Dez Bryant to the Patriots makes way too much ...</td>\n",
+       "      <td>https://www.patspulpit.com/2018/8/22/17770742/...</td>\n",
+       "      <td>patriots</td>\n",
+       "      <td>patriot sign dez bryant could not obvious not ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>131</th>\n",
+       "      <td>2018-08-22 00:00:00</td>\n",
+       "      <td>[makes, way, midpreseason, roster, form, wont,...</td>\n",
+       "      <td>Dez Bryant to the Patriots makes way too much ...</td>\n",
+       "      <td>New England Patriots links 8/22/18 - 53-Man ro...</td>\n",
+       "      <td>https://www.patspulpit.com/2018/8/22/17768074/...</td>\n",
+       "      <td>patriots</td>\n",
+       "      <td>dez bryant patriot make way much sense happen ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>163</th>\n",
+       "      <td>2018-04-15 00:00:00</td>\n",
+       "      <td>[season, panthers, carolina, play, free, agenc...</td>\n",
+       "      <td>The Carolina Panthers are not expected to purs...</td>\n",
+       "      <td>NFL free agency: Carolina Panthers not expecte...</td>\n",
+       "      <td>https://www.catscratchreader.com/2018/4/15/172...</td>\n",
+       "      <td>panthers</td>\n",
+       "      <td>carolina panther not expect pursue recently re...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                    date                                           keywords  \\\n",
+       "127  2018-08-22 00:00:00  [makes, way, happen, sign, thinks, think, rout...   \n",
+       "131  2018-08-22 00:00:00  [makes, way, midpreseason, roster, form, wont,...   \n",
+       "163  2018-04-15 00:00:00  [season, panthers, carolina, play, free, agenc...   \n",
+       "\n",
+       "                                                  text  \\\n",
+       "127  The Patriots should sign Dez Bryant. It couldn...   \n",
+       "131  Dez Bryant to the Patriots makes way too much ...   \n",
+       "163  The Carolina Panthers are not expected to purs...   \n",
+       "\n",
+       "                                                 title  \\\n",
+       "127  Dez Bryant to the Patriots makes way too much ...   \n",
+       "131  New England Patriots links 8/22/18 - 53-Man ro...   \n",
+       "163  NFL free agency: Carolina Panthers not expecte...   \n",
+       "\n",
+       "                                                   url      team  \\\n",
+       "127  https://www.patspulpit.com/2018/8/22/17770742/...  patriots   \n",
+       "131  https://www.patspulpit.com/2018/8/22/17768074/...  patriots   \n",
+       "163  https://www.catscratchreader.com/2018/4/15/172...  panthers   \n",
+       "\n",
+       "                                            clean_text  \n",
+       "127  patriot sign dez bryant could not obvious not ...  \n",
+       "131  dez bryant patriot make way much sense happen ...  \n",
+       "163  carolina panther not expect pursue recently re...  "
+      ]
+     },
+     "execution_count": 167,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "nfl[nfl.keywords.apply(lambda x: 'bryant' in x)]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Text Wrangling & Preprocessing"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import spacy\n",
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import nltk\n",
+    "from nltk.tokenize.toktok import ToktokTokenizer\n",
+    "import re\n",
+    "from bs4 import BeautifulSoup\n",
+    "from contractions import CONTRACTION_MAP\n",
+    "import unicodedata\n",
+    "nlp = spacy.load('en', parse=True, tag=True, entity=True)\n",
+    "#nlp_vec = spacy.load('en_vecs', parse = True, tag=True, #entity=True)\n",
+    "tokenizer = ToktokTokenizer()\n",
+    "stopword_list = nltk.corpus.stopwords.words('english')\n",
+    "stopword_list.remove('no')\n",
+    "stopword_list.remove('not')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# https://towardsdatascience.com/a-practitioners-guide-to-natural-language-processing-part-i-processing-understanding-text-9f4abfd13e72\n",
+    "def strip_html_tags(text):\n",
+    "    soup = BeautifulSoup(text, \"html.parser\")\n",
+    "    stripped_text = soup.get_text()\n",
+    "    return stripped_text\n",
+    "\n",
+    "def simple_stemmer(text):\n",
+    "    ps = nltk.porter.PorterStemmer()\n",
+    "    text = ' '.join([ps.stem(word) for word in text.split()])\n",
+    "    return text\n",
+    "\n",
+    "def lemmatize_text(text):\n",
+    "    text = nlp(text)\n",
+    "    text = ' '.join([word.lemma_ if word.lemma_ != '-PRON-' else word.text for word in text])\n",
+    "    return text\n",
+    "\n",
+    "def remove_accented_chars(text):\n",
+    "    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8', 'ignore')\n",
+    "    return text\n",
+    "\n",
+    "def remove_stopwords(text, is_lower_case=False):\n",
+    "    tokens = tokenizer.tokenize(text)\n",
+    "    tokens = [token.strip() for token in tokens]\n",
+    "    if is_lower_case:\n",
+    "        filtered_tokens = [token for token in tokens if token not in stopword_list]\n",
+    "    else:\n",
+    "        filtered_tokens = [token for token in tokens if token.lower() not in stopword_list]\n",
+    "    filtered_text = ' '.join(filtered_tokens)    \n",
+    "    return filtered_text\n",
+    "\n",
+    "def expand_contractions(text, contraction_mapping=CONTRACTION_MAP):\n",
+    "    \n",
+    "    contractions_pattern = re.compile('({})'.format('|'.join(contraction_mapping.keys())), \n",
+    "                                      flags=re.IGNORECASE|re.DOTALL)\n",
+    "    def expand_match(contraction):\n",
+    "        match = contraction.group(0)\n",
+    "        first_char = match[0]\n",
+    "        expanded_contraction = contraction_mapping.get(match)\\\n",
+    "                                if contraction_mapping.get(match)\\\n",
+    "                                else contraction_mapping.get(match.lower())                       \n",
+    "        expanded_contraction = first_char+expanded_contraction[1:]\n",
+    "        return expanded_contraction\n",
+    "        \n",
+    "    expanded_text = contractions_pattern.sub(expand_match, text)\n",
+    "    expanded_text = re.sub(\"'\", \"\", expanded_text)\n",
+    "    return expanded_text\n",
+    "\n",
+    "def remove_special_characters(text, remove_digits=False):\n",
+    "    pattern = r'[^a-zA-z0-9\\s]' if not remove_digits else r'[^a-zA-z\\s]'\n",
+    "    text = re.sub(pattern, '', text)\n",
+    "    return text"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def normalize_corpus(corpus, html_stripping=True, contraction_expansion=True,\n",
+    "                     accented_char_removal=True, text_lower_case=True, \n",
+    "                     text_lemmatization=True, special_char_removal=True, \n",
+    "                     stopword_removal=True, remove_digits=True):\n",
+    "    \n",
+    "    normalized_corpus = []\n",
+    "    # normalize each document in the corpus\n",
+    "    for doc in corpus:\n",
+    "        # strip HTML\n",
+    "        if html_stripping:\n",
+    "            doc = strip_html_tags(doc)\n",
+    "        # remove accented characters\n",
+    "        if accented_char_removal:\n",
+    "            doc = remove_accented_chars(doc)\n",
+    "        # expand contractions    \n",
+    "        if contraction_expansion:\n",
+    "            doc = expand_contractions(doc)\n",
+    "        # lowercase the text    \n",
+    "        if text_lower_case:\n",
+    "            doc = doc.lower()\n",
+    "        # remove extra newlines\n",
+    "        doc = re.sub(r'[\\r|\\n|\\r\\n]+', ' ',doc)\n",
+    "        # lemmatize text\n",
+    "        if text_lemmatization:\n",
+    "            doc = lemmatize_text(doc)\n",
+    "        # remove special characters and\\or digits    \n",
+    "        if special_char_removal:\n",
+    "            # insert spaces between special characters to isolate them    \n",
+    "            special_char_pattern = re.compile(r'([{.(-)!}])')\n",
+    "            doc = special_char_pattern.sub(\" \\\\1 \", doc)\n",
+    "            doc = remove_special_characters(doc, remove_digits=remove_digits)  \n",
+    "        # remove extra whitespace\n",
+    "        doc = re.sub(' +', ' ', doc)\n",
+    "        # remove stopwords\n",
+    "        if stopword_removal:\n",
+    "            doc = remove_stopwords(doc, is_lower_case=text_lower_case)\n",
+    "            \n",
+    "        normalized_corpus.append(doc)\n",
+    "        \n",
+    "    return normalized_corpus"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 60,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "news_df = new_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 64,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "news_df['clean_text'] = normalize_corpus(news_df['text'])\n",
+    "norm_corpus = list(news_df['clean_text'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'clean_text': 'seahawk know would not need nick vannett set world fire right away spend third round pick vannett year trade jimmy graham first season vannett low fourth depth chart time behind graham luke willson brandon william last spring william sign colt allow vannett move least third team make decent contribution team primarily extra blocker run play even end start four game head season graham willson go finally vannetts time excellent opportunity step full time starter role season flourish offense predict next breakout star nfl team retire nfl defensive end stephen white grind tape summer figure player poise big leap forward team breakout player pound vannett give seattle quarterback russell wilson huge target pass game vannett not big lug either look fluid fast running route field pretty good hand well unlike graham vannett also damn good blocker mean not liability seahawk want run ball vannett probably not ever receive threat graham lot well rounded graham may not make spectacular catch plenty opportunity make gang routine reception season interesting no way know vannett ceiling right not really lot playing time target last season not get many rep pass game catch yard touchdown game stay healthy season may come close get target one game starter end last year essentially third team guy know may well guy make spectacular graham esque catch not give chance till combination size athleticism certainly good chance vannett actually end one hell red zone threat know sure watch tape kid not seem lack confidence swagger least not think pressure starter bother either fact may well thrive vannett make routine catch starter season see huge jump production think go much year however confidence level high',\n",
+       " 'text': 'The Seahawks knew they wouldn’t need Nick Vannett to set the world on fire right away. They spent a third-round pick on Vannett in 2016, a year after they traded for Jimmy Graham. That first season, Vannett was as low as fourth on the depth chart at times behind Graham, Luke Willson, and Brandon Williams.\\n\\nLast spring, Williams signed with the Colts, which allowed Vannett to move up to at least third team and make a decent contribution to the team, primarily as an extra blocker on running plays. He even ended up starting four games.\\n\\nHeading into the 2018 season with both Graham and Willson gone, it is finally Vannett’s time.\\n\\nHe has an excellent opportunity to step up into the full-time starter’s role this season and flourish in that offense.\\n\\nPredicting the next breakout star for all 32 NFL teams Retired NFL defensive end Stephen White has been grinding tape all summer to figure out which players are poised for a big leap forward in 2018. Who’s your team’s breakout player?\\n\\nAt 6’6 and 261 pounds, Vannett gives Seattle quarterback Russell Wilson a huge target in the passing game. Vannett is not just some big lug, either. He looks fluid and fast running routes up the field, and he has some pretty good hands as well.\\n\\nUnlike Graham, Vannett is also a damn good blocker, which means he won’t be a liability when the Seahawks want to run the ball. Vannett probably won’t ever be the receiving threat that Graham is, but he is a lot more well-rounded than Graham. He may not make the spectacular catch, but there will be plenty of opportunities for him to make a gang of “routine” receptions this season.\\n\\nWhat’s interesting is there’s no way to know what Vannett’s ceiling is right now, because he hasn’t really had a lot of playing time or targets. Last season, when he didn’t get many reps in the passing game, he only had 12 catches for 124 yards and a touchdown in 15 games. If he can stay healthy this season, he may come close to getting more targets in one game as a starter than he ended up with all of last year (15) as, essentially, the third-team guy.\\n\\nFor all I know, he might well be a guy who can make spectacular Graham-esque catches too, but he just hasn’t been given a chance up till now.\\n\\nWith his combination of size and athleticism, there is certainly a good chance that Vannett will actually end up being one hell of a red zone threat.\\n\\nWhat I do know for sure, is that when I watch him on tape the kid does not seem to lack for confidence or swagger in the least. I don’t think the pressure of being the starter now will bother him at all, either. In fact, he may well thrive on it.\\n\\nIf Vannett can just make the routine catches as a starter this season, he should see a huge jump in production. I think he is going to do much more than that this year, however.\\n\\nConfidence level: High'}"
+      ]
+     },
+     "execution_count": 65,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "news_df.iloc[1][['text', 'clean_text']].to_dict()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "save to csv"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "news_df.to_csv('news.csv', index=False, encoding='utf-8')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "named entity recognition with `SpaCy` Here is the [Entity Meanings](https://spacy.io/api/annotation#named-entities)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[(Nick, 'PERSON'), (Vannett, 'PERSON'), (third, 'ORDINAL'), (Vannett, 'PERSON'), (2016, 'DATE'), (a, 'DATE'), (year, 'DATE'), (Jimmy, 'PERSON'), (Graham, 'PERSON'), (first, 'ORDINAL'), (Vannett, 'PERSON'), (as, 'CARDINAL'), (low, 'CARDINAL'), (as, 'CARDINAL'), (fourth, 'CARDINAL'), (Graham, 'PERSON'), (Luke, 'PERSON'), (Willson, 'PERSON'), (Brandon, 'PERSON'), (Williams, 'PERSON'), (Last, 'DATE'), (spring, 'DATE'), (Williams, 'PERSON'), (Colts, 'PERSON'), (Vannett, 'PERSON'), (at, 'CARDINAL'), (least, 'CARDINAL'), (third, 'CARDINAL'), (four, 'CARDINAL'), (the, 'DATE'), (2018, 'DATE'), (season, 'DATE'), (Graham, 'PERSON'), (Willson, 'ORG'), (Vannett, 'PERSON'), (Predicting, 'GPE'), (32, 'CARDINAL'), (NFL, 'ORG'), (Retired, 'PERSON'), (NFL, 'PERSON'), (Stephen, 'PERSON'), (White, 'PERSON'), (all, 'DATE'), (summer, 'DATE'), (2018, 'DATE'), (6’6, 'CARDINAL'), (261, 'QUANTITY'), (pounds, 'QUANTITY'), (Vannett, 'PERSON'), (Seattle, 'GPE'), (Russell, 'PERSON'), (Wilson, 'PERSON'), (Graham, 'PERSON'), (Vannett, 'PERSON'), (Seahawks, 'ORG'), (Graham, 'PERSON'), (Graham, 'PERSON'), (this, 'DATE'), (season, 'DATE'), (Vannett, 'PERSON'), (Last, 'DATE'), (season, 'DATE'), (12, 'CARDINAL'), (124, 'QUANTITY'), (yards, 'QUANTITY'), (15, 'CARDINAL'), (this, 'DATE'), (season, 'DATE'), (one, 'CARDINAL'), (last, 'DATE'), (year, 'DATE'), (15, 'CARDINAL'), (third, 'ORDINAL'), (Graham, 'PERSON'), (-, 'PERSON'), (esque, 'PERSON'), (Vannett, 'PERSON'), (Vannett, 'PERSON'), (this, 'DATE'), (season, 'DATE'), (this, 'DATE'), (year, 'DATE')]\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div class=\"entities\" style=\"line-height: 2.5\">The Seahawks knew they wouldn’t need \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Nick Vannett\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " to set the world on fire right away. They spent a \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    third\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">ORDINAL</span>\n",
+       "</mark>\n",
+       "-round pick on \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Vannett\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " in \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    2016\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       ", \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    a year\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       " after they traded for \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Jimmy Graham\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       ". That \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    first\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">ORDINAL</span>\n",
+       "</mark>\n",
+       " season, \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Vannett\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " was \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    as low as fourth\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">CARDINAL</span>\n",
+       "</mark>\n",
+       " on the depth chart at times behind \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Graham\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       ", \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Luke Willson\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       ", and \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Brandon Williams\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       ".</br></br>\n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Last spring\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       ", \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Williams\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " signed with the \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Colts\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       ", which allowed \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Vannett\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " to move up to \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    at least third\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">CARDINAL</span>\n",
+       "</mark>\n",
+       " team and make a decent contribution to the team, primarily as an extra blocker on running plays. He even ended up starting \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    four\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">CARDINAL</span>\n",
+       "</mark>\n",
+       " games.</br></br>Heading into \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    the 2018 season\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       " with both \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Graham\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " and \n",
+       "<mark class=\"entity\" style=\"background: #7aecec; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Willson\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">ORG</span>\n",
+       "</mark>\n",
+       " gone, it is finally \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Vannett\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       "’s time.</br></br>He has an excellent opportunity to step up into the full-time starter’s role this season and flourish in that offense.</br></br>\n",
+       "<mark class=\"entity\" style=\"background: #feca74; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Predicting\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">GPE</span>\n",
+       "</mark>\n",
+       " the next breakout star for all \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    32\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">CARDINAL</span>\n",
+       "</mark>\n",
+       " \n",
+       "<mark class=\"entity\" style=\"background: #7aecec; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    NFL\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">ORG</span>\n",
+       "</mark>\n",
+       " teams \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Retired NFL\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " defensive end \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Stephen White\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " has been grinding tape \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    all summer\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       " to figure out which players are poised for a big leap forward in \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    2018\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       ". Who’s your team’s breakout player?</br></br>At \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    6’6\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">CARDINAL</span>\n",
+       "</mark>\n",
+       " and \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    261 pounds\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">QUANTITY</span>\n",
+       "</mark>\n",
+       ", \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Vannett\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " gives \n",
+       "<mark class=\"entity\" style=\"background: #feca74; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Seattle\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">GPE</span>\n",
+       "</mark>\n",
+       " quarterback \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Russell Wilson\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " a huge target in the passing game. Vannett is not just some big lug, either. He looks fluid and fast running routes up the field, and he has some pretty good hands as well.</br></br>Unlike \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Graham\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       ", \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Vannett\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " is also a damn good blocker, which means he won’t be a liability when the \n",
+       "<mark class=\"entity\" style=\"background: #7aecec; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Seahawks\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">ORG</span>\n",
+       "</mark>\n",
+       " want to run the ball. Vannett probably won’t ever be the receiving threat that \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Graham\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " is, but he is a lot more well-rounded than \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Graham\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       ". He may not make the spectacular catch, but there will be plenty of opportunities for him to make a gang of “routine” receptions \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    this season\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       ".</br></br>What’s interesting is there’s no way to know what \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Vannett\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       "’s ceiling is right now, because he hasn’t really had a lot of playing time or targets. \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Last season\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       ", when he didn’t get many reps in the passing game, he only had \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    12\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">CARDINAL</span>\n",
+       "</mark>\n",
+       " catches for \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    124 yards\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">QUANTITY</span>\n",
+       "</mark>\n",
+       " and a touchdown in \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    15\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">CARDINAL</span>\n",
+       "</mark>\n",
+       " games. If he can stay healthy \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    this season\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       ", he may come close to getting more targets in \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    one\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">CARDINAL</span>\n",
+       "</mark>\n",
+       " game as a starter than he ended up with all of \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    last year\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       " (\n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    15\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">CARDINAL</span>\n",
+       "</mark>\n",
+       ") as, essentially, the \n",
+       "<mark class=\"entity\" style=\"background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    third\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">ORDINAL</span>\n",
+       "</mark>\n",
+       "-team guy.</br></br>For all I know, he might well be a guy who can make spectacular \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Graham-esque\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " catches too, but he just hasn’t been given a chance up till now.</br></br>With his combination of size and athleticism, there is certainly a good chance that \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Vannett\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " will actually end up being one hell of a red zone threat.</br></br>What I do know for sure, is that when I watch him on tape the kid does not seem to lack for confidence or swagger in the least. I don’t think the pressure of being the starter now will bother him at all, either. In fact, he may well thrive on it.</br></br>If \n",
+       "<mark class=\"entity\" style=\"background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    Vannett\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">PERSON</span>\n",
+       "</mark>\n",
+       " can just make the routine catches as a starter \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    this season\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       ", he should see a huge jump in production. I think he is going to do much more than that \n",
+       "<mark class=\"entity\" style=\"background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em; box-decoration-break: clone; -webkit-box-decoration-break: clone\">\n",
+       "    this year\n",
+       "    <span style=\"font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; text-transform: uppercase; vertical-align: middle; margin-left: 0.5rem\">DATE</span>\n",
+       "</mark>\n",
+       ", however.\n",
+       "\n",
+       "Confidence level: High</div>"
+      ],
+      "text/plain": [
+       "<IPython.core.display.HTML object>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "from spacy import displacy\n",
+    "\n",
+    "sentence = str(news_df.iloc[1].text)\n",
+    "sentence_nlp = nlp(sentence)\n",
+    "\n",
+    "# print named entities in article\n",
+    "print([(word, word.ent_type_) for word in sentence_nlp if word.ent_type_])\n",
+    "\n",
+    "# visualize named entities\n",
+    "displacy.render(sentence_nlp, style='ent', jupyter=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Sentiment Analysis with AFINN Lexicon"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let’s now find out the most frequent named entities in our news corpus! For this, we will build out a data frame of all the named entities and their types using the following code."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# create a basic pre-processed corpus, don't lowercase to get POS context\n",
+    "corpus = normalize_corpus(news_df['text'], text_lower_case=False, \n",
+    "                          text_lemmatization=False, special_char_removal=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 70,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# initialize afinn sentiment analyzer\n",
+    "from afinn import Afinn\n",
+    "af = Afinn()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sentiment_scores = [af.score(article) for article in corpus]\n",
+    "sentiment_category = ['positive' if score > 0 \n",
+    "                          else 'negative' if score < 0 \n",
+    "                              else 'neutral' \n",
+    "                                  for score in sentiment_scores]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 75,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.DataFrame([list(news_df['team']), sentiment_scores, sentiment_category]).T"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 76,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style>\n",
+       "    .dataframe thead tr:only-child th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: left;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr>\n",
+       "      <th></th>\n",
+       "      <th colspan=\"8\" halign=\"left\">sentiment_score</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th></th>\n",
+       "      <th>count</th>\n",
+       "      <th>mean</th>\n",
+       "      <th>std</th>\n",
+       "      <th>min</th>\n",
+       "      <th>25%</th>\n",
+       "      <th>50%</th>\n",
+       "      <th>75%</th>\n",
+       "      <th>max</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>team</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>cardinals</th>\n",
+       "      <td>141.0</td>\n",
+       "      <td>17.070922</td>\n",
+       "      <td>20.019507</td>\n",
+       "      <td>-21.0</td>\n",
+       "      <td>4.00</td>\n",
+       "      <td>12.0</td>\n",
+       "      <td>26.00</td>\n",
+       "      <td>86.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>cheese</th>\n",
+       "      <td>139.0</td>\n",
+       "      <td>15.381295</td>\n",
+       "      <td>28.868115</td>\n",
+       "      <td>-57.0</td>\n",
+       "      <td>0.50</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>22.00</td>\n",
+       "      <td>175.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>panthers</th>\n",
+       "      <td>166.0</td>\n",
+       "      <td>12.487952</td>\n",
+       "      <td>17.213363</td>\n",
+       "      <td>-26.0</td>\n",
+       "      <td>1.25</td>\n",
+       "      <td>6.5</td>\n",
+       "      <td>18.75</td>\n",
+       "      <td>65.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>patriots</th>\n",
+       "      <td>185.0</td>\n",
+       "      <td>23.329730</td>\n",
+       "      <td>54.724750</td>\n",
+       "      <td>-67.0</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>13.0</td>\n",
+       "      <td>28.00</td>\n",
+       "      <td>448.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>seahawks</th>\n",
+       "      <td>151.0</td>\n",
+       "      <td>19.410596</td>\n",
+       "      <td>30.898386</td>\n",
+       "      <td>-45.0</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>32.50</td>\n",
+       "      <td>135.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>steelers</th>\n",
+       "      <td>38.0</td>\n",
+       "      <td>9.394737</td>\n",
+       "      <td>12.985521</td>\n",
+       "      <td>-31.0</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>10.0</td>\n",
+       "      <td>21.00</td>\n",
+       "      <td>34.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "          sentiment_score                                                 \\\n",
+       "                    count       mean        std   min   25%   50%    75%   \n",
+       "team                                                                       \n",
+       "cardinals           141.0  17.070922  20.019507 -21.0  4.00  12.0  26.00   \n",
+       "cheese              139.0  15.381295  28.868115 -57.0  0.50   8.0  22.00   \n",
+       "panthers            166.0  12.487952  17.213363 -26.0  1.25   6.5  18.75   \n",
+       "patriots            185.0  23.329730  54.724750 -67.0  0.00  13.0  28.00   \n",
+       "seahawks            151.0  19.410596  30.898386 -45.0  0.00  11.0  32.50   \n",
+       "steelers             38.0   9.394737  12.985521 -31.0  0.00  10.0  21.00   \n",
+       "\n",
+       "                  \n",
+       "             max  \n",
+       "team              \n",
+       "cardinals   86.0  \n",
+       "cheese     175.0  \n",
+       "panthers    65.0  \n",
+       "patriots   448.0  \n",
+       "seahawks   135.0  \n",
+       "steelers    34.0  "
+      ]
+     },
+     "execution_count": 76,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.columns = ['team', 'sentiment_score', 'sentiment_category']\n",
+    "df['sentiment_score'] = df.sentiment_score.astype('float')\n",
+    "df.groupby(by=['team']).describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 80,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns\n",
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 81,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<matplotlib.figure.Figure at 0x7f4c0ad17c88>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "\n",
+    "f, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 4))\n",
+    "sp = sns.stripplot(x='team', y=\"sentiment_score\", \n",
+    "                   hue='team', data=df, ax=ax1)\n",
+    "bp = sns.boxplot(x='team', y=\"sentiment_score\", \n",
+    "                 hue='team', data=df, palette=\"Set2\", ax=ax2)\n",
+    "t = f.suptitle('Visualizing News Sentiment', fontsize=14)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 82,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/home/redne/anaconda3/lib/python3.6/site-packages/seaborn/categorical.py:3666: UserWarning: The `factorplot` function has been renamed to `catplot`. The original name will be removed in a future release. Please update your code. Note that the default `kind` in `factorplot` (`'point'`) has changed `'strip'` in `catplot`.\n",
+      "  warnings.warn(msg)\n"
+     ]
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<matplotlib.figure.Figure at 0x7f4c0ab78358>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "fc = sns.factorplot(x=\"team\", hue=\"sentiment_category\", \n",
+    "                    data=df, kind=\"count\", \n",
+    "                    palette={\"negative\": \"#FE2020\", \n",
+    "                             \"positive\": \"#BADD07\", \n",
+    "                             \"neutral\": \"#68BFF5\"})"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let’s dive deeper into the most positive and negative sentiment news articles for technology news."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 171,
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Most Negative Tech News Article: Century Links 8/20: Who Impressed, Who Didn’t After Chargers Preseason Game\n",
+      "\n",
+      "Most Positive Tech News Article: A few pics from Training Camp 8/13\n"
+     ]
+    }
+   ],
+   "source": [
+    "pos_idx = df[(df.team=='seahawks') & (df.sentiment_score == 6)].index[0]\n",
+    "neg_idx = df[(df.team=='seahawks') & (df.sentiment_score == -15)].index[0]\n",
+    "\n",
+    "print('Most Negative Tech News Article:', news_df.iloc[neg_idx][['title']][0])\n",
+    "print()\n",
+    "print('Most Positive Tech News Article:', news_df.iloc[pos_idx][['title']][0])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
