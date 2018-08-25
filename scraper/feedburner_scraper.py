@@ -56,6 +56,28 @@ List keywords ['thing', 'mock', 'hit', 'midpreseason', 'followed', 'watch', 'sea
 -------------------------------------------------------------------------------
 """
 
+# using feedparser to get url listing then fead it through feedburner_scraper
+import feedparser
+def feedparser_search(url_string):
+    urls = feedparser.parse(url_string)
+    pat_urls = []
+    for url in urls['entries']:
+        x = url['links'][0]['href']
+        pat_urls.append(x)
+    
+    print("Number of articles: ", len(pat_urls))
+    
+    tables = feedburner_scraper(pat_urls)
+    
+    
+    return tables
+
+# nflnation = feedparser_search('http://www.espn.com/blog/feed?blog=nflnation')
+
+
+
+
+
 # Get Transcripts from youtube videos
 from youtube_transcript_api import YouTubeTranscriptApi
 def youtube_scraper(url_string):
@@ -77,7 +99,6 @@ def youtube_scraper(url_string):
     return newsy_urls
 
 # nfl_youtube = youtube_scraper('https://www.youtube.com/feeds/videos.xml?user=NFL')
-
 
 # Save to json
 import json
