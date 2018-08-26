@@ -1,5 +1,7 @@
 import newspaper
 from newspaper import Article
+import pandas as pd
+from datetime import datetime
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
@@ -20,27 +22,28 @@ def feedburner_scraper(url_list):
         post.nlp()
 
         row['url'] = post.url
-        row['date'] = post.publish_date
+        row['date'] = pd.to_datetime(post.publish_date).date()
         row['title'] = post.title
         row['keywords'] = post.keywords
         row['text'] = post.text
+        row['team'] = team
         feed_articles.append(row)
-    
-    
     
     return feed_articles
     
-def sbnation_scraper(url):
+def sbnation_scraper(url, team):
     newys = newspaper.build(url, memoize_articles=False)
     newsy_urls = []
     for article in newys.articles:
-        if '2018' in article.url:
+        if '2018' in article.url and '#' not in article.url:
             newsy_urls.append(article.url)
     
+    print("------------ ",team," -----------")
     print("# of articles found: ", len(newsy_urls))
     
-    news = feedburner_scraper(newsy_urls)
-    print("# of articles: ", len(news))
+    news = feedburner_scraper(newsy_urls, team)
+    
+    print("# of articles processed: ", len(news))
     print("List keys: ",news[0].keys())
     print("List keywords", news[0]['keywords'])
     return news
@@ -79,7 +82,17 @@ def feedparser_search(url_string, team):
 
 # nflnation = feedparser_search('http://www.espn.com/blog/feed?blog=nflnation')
 
-def get_feed(
+def get_feed(feed_dict):
+    df = []
+    for team in feed_dict:
+        result = feedparser_search(feed_dict[team], team)
+        table = pd.DataFrame(result)
+        df.append(table)
+
+    nfl = pd.concat(df)
+    nfl = nfl.drop_duplicates(subset='title').reset_index(drop=True)
+    
+    return nfl
 
 
 
