@@ -58,23 +58,28 @@ List keywords ['thing', 'mock', 'hit', 'midpreseason', 'followed', 'watch', 'sea
 
 # using feedparser to get url listing then fead it through feedburner_scraper
 import feedparser
-def feedparser_search(url_string):
+def feedparser_search(url_string, team):
     urls = feedparser.parse(url_string)
     pat_urls = []
     for url in urls['entries']:
         x = url['links'][0]['href']
         pat_urls.append(x)
     
+    print("------------ ",team," -----------")
     print("Number of articles: ", len(pat_urls))
     
-    tables = feedburner_scraper(pat_urls)
+    tables = feedburner_scraper(pat_urls, team)
     
+       
+    print("# of articles processed: ", len(tables))
+    print("List keys: ",tables[0].keys())
+    print("List keywords", tables[0]['keywords'])
     
     return tables
 
 # nflnation = feedparser_search('http://www.espn.com/blog/feed?blog=nflnation')
 
-
+def get_feed(
 
 
 
