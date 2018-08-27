@@ -1,3 +1,12 @@
+"""
+Development of a python scraper to pull articles from NFL Teams News 
+RSS Feeds. This scripts parses the rss feed,and organizes in to the necessary
+fields and saves it to a CSV file. We are working on pulling this directly in
+to a SQLite database. 
+
+This code is heavily reliant on Newspaper, here is the documentations:https://newspaper.readthedocs.io/en/latest/
+"""
+
 import newspaper
 from newspaper import Article
 import pandas as pd
@@ -46,6 +55,10 @@ def feedburner_scraper(url_list):
     return feed_articles
     
 def sbnation_scraper(url, team):
+    """
+    function to pull the rss/news URL with the team name and necessary fields using the
+    `feedburner_scraper` function listed above. 
+    """
     newys = newspaper.build(url, memoize_articles=False)
     newsy_urls = []
     for article in newys.articles:
