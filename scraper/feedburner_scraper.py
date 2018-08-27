@@ -6,6 +6,12 @@ from datetime import datetime
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
+import os
+"""
+This is the most annoying thing about newspaper... i love it but, there is a manual 
+hack that i had to put in because the articles wouldnt cache correcntly. 
+"""
+cache_to_remove = '<INSERT HOME DIR> + .newspaper_scraper/feed_category_cache> + HASH'
 
 def newspaper_parser(url):
     article = Article(url)
