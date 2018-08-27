@@ -24,16 +24,24 @@ def feedburner_scraper(url_list):
         row = {}
         post = newspaper_parser(url)
         post.download()
+        if post.download_state == 1: continue
+            
         post.parse()
         post.nlp()
 
         row['url'] = post.url
-        row['date'] = pd.to_datetime(post.publish_date).date()
+        if post.publish_date is None:
+            row['date'] = None
+        else:
+            row['date'] = pd.to_datetime(post.publish_date).date()
         row['title'] = post.title
         row['keywords'] = post.keywords
         row['text'] = post.text
         row['team'] = team
         feed_articles.append(row)
+        
+    try: os.remove(cache_to_remove)
+    except OSError: pass
     
     return feed_articles
     
