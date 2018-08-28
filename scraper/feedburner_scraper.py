@@ -23,18 +23,20 @@ hack that i had to put in because the articles wouldnt cache correcntly.
 cache_to_remove = '<INSERT HOME DIR> + .newspaper_scraper/feed_category_cache> + HASH'
 
 def newspaper_parser(url):
-    article = Article(url)
+    article = Article(url, memoize_articles=True, fetch_images=False)
 
     return article
 
-def feedburner_scraper(url_list):
+def feedburner_scraper(url_list, team):
+    from datetime import datetime
     feed_articles = []
     for url in url_list:     
         row = {}
         post = newspaper_parser(url)
         post.download()
-        if post.download_state == 1: continue
-            
+        if post.download_state != 2:
+            print("URL not downloaded: ", url)
+            continue
         post.parse()
         post.nlp()
 
@@ -45,6 +47,7 @@ def feedburner_scraper(url_list):
             row['date'] = pd.to_datetime(post.publish_date).date()
         row['title'] = post.title
         row['keywords'] = post.keywords
+        #row['text'] = post.summary
         row['text'] = post.text
         row['team'] = team
         feed_articles.append(row)
@@ -53,16 +56,17 @@ def feedburner_scraper(url_list):
     except OSError: pass
     
     return feed_articles
+
     
 def sbnation_scraper(url, team):
     """
     function to pull the rss/news URL with the team name and necessary fields using the
     `feedburner_scraper` function listed above. 
     """
-    newys = newspaper.build(url, memoize_articles=False)
+    newys = newspaper.build(url, memoize_articles=True, fetch_images=False)
     newsy_urls = []
     for article in newys.articles:
-        if '2018' in article.url and '#' not in article.url:
+        if 'sportspyder.com/' not in article.url:
             newsy_urls.append(article.url)
     
     print("------------ ",team," -----------")
@@ -73,6 +77,7 @@ def sbnation_scraper(url, team):
     print("# of articles processed: ", len(news))
     print("List keys: ",news[0].keys())
     print("List keywords", news[0]['keywords'])
+    
     return news
     
 # hawks = sbnation_scraper('https://www.fieldgulls.com')
