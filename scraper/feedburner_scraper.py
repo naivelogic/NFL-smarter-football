@@ -75,8 +75,9 @@ def sbnation_scraper(url, team):
     news = feedburner_scraper(newsy_urls, team)
     
     print("# of articles processed: ", len(news))
-    print("List keys: ",news[0].keys())
-    print("List keywords", news[0]['keywords'])
+    if len(news) != 0:
+        print("List keys: ",news[0].keys())
+        print("List keywords", news[0]['keywords'])
     
     return news
     
