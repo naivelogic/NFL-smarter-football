@@ -29,7 +29,9 @@ def game_weeks(df):
     return week_list
 
 def make_week(df):
-    
+    """
+    Create function to make week number for each seasonal game. 
+    """
     week_df = []
     for season in df.Season.unique():
         print(season)
