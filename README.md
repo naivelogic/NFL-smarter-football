@@ -8,6 +8,7 @@ In this repository, there is an accumulation of different projects and notebooks
 * Running Back Analytics
 * NFL Playoff Prediction
 * NFL Play-by-Play Run/Pass Prediction 
+* Walkthroughs of applied machine learning pipelines 
 
 ## Introduction
 Months away from the 2019 NFL season, we take a look back on past NFL team season statistics to build a model to predict if a team is playoff bound or not. 
