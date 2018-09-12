@@ -17,7 +17,7 @@ Machine learning models require much more than individual player and team statis
 
 
 ## Data Source
-Most related to NFL Play-by-Play (pbp) 2012 - 2017 season is from [nflscraoR-data](). 
+Most related to NFL Play-by-Play (pbp) 2012 - 2017 season is from [nflscraoR-data](https://github.com/ryurko/nflscrapR-data). 
 
 
 __Point to remember about causality:__ One law of data science to keep top of mind: correlation does not imply causation. This is a common statistical phases used to emphasize that a correlation between two variables does not imply that one causes the other.
