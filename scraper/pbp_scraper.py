@@ -50,4 +50,3 @@ def play_by_play(url):
     
 #soup = grab_data('https://www.pro-football-reference.com/boxscores/201809060phi.htm', blocks=True)
 #df = play_by_play(soup)
-  #
