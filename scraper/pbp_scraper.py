@@ -48,5 +48,55 @@ def play_by_play(url):
 
   return df
     
-#soup = grab_data('https://www.pro-football-reference.com/boxscores/201809060phi.htm', blocks=True)
-#df = play_by_play(soup)
+soup = grab_data('https://www.pro-football-reference.com/boxscores/201809060phi.htm', blocks=True)
+## Need to work on for loop to loop through each week box score provided by the box_score_urls function
+df = play_by_play(soup)
+
+# indicate home and away teams
+home_drives['pos'] = df.columns[7]
+away_drives['pos'] = df.columns[6]
+
+
+def pullTable(url, tableID, header = True):
+# https://github.com/BenKite/football_data/blob/master/profootballReferenceScrape.py
+
+    res = requests.get(url)
+    ## Work around comments
+    comm = re.compile("<!--|-->")
+    soup = BeautifulSoup(comm.sub("", res.text), 'lxml')
+    tables = soup.findAll('table', id = tableID)
+    data_rows = tables[0].findAll('tr')
+    game_data = [[td.getText() for td in data_rows[i].findAll(['th','td'])]
+        for i in range(len(data_rows))
+        ]
+    data = pd.DataFrame(game_data)
+    if header == True:
+        data_header = tables[0].findAll('thead')
+        data_header = data_header[0].findAll("tr")
+        data_header = data_header[0].findAll("th")
+        header = []
+        for i in range(len(data.columns)):
+            header.append(data_header[i].getText())
+        data.columns = header
+        data = data.loc[data[header[0]] != header[0]]
+    data = data.reset_index(drop = True)
+    return(data)
+
+### Identify Offensive Possession ###
+home_drives = pullTable('https://www.pro-football-reference.com/boxscores/201809060phi.htm', 'home_drives')
+away_drives = pullTable('https://www.pro-football-reference.com/boxscores/201809060phi.htm', 'vis_drives')
+
+# creat table for game drives
+drives = away_drives.append(home_drives).reset_index(drop=True)
+
+drives['FTime'] = pd.to_datetime(drives['Time'])
+drives['#'] = drives['#'].astype(int)
+drives = drives.sort_values(by=['Quarter','Time'], ascending=[True,False])
+drives = drives.reset_index(drop=True)
+
+# create loop to define offensive that has possession of the ball in the `df` dataframe
+for i in range(len(drives)):
+    df.loc[(df.FTime <= drives.FTime[i]) & (df.Quarter == drives.Quarter[i]) &
+           (df.Time!=''), 'pos'] = drives.pos[i]
+
+# add new features for adjustment on time 
