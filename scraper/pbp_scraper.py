@@ -103,12 +103,75 @@ for i in range(len(drives)):
         #    WIP    #
     
 
-# Feature Development
+# NFL Data Table Fields
+## Passing Data Table
+passing_features = []
+
 for i,play in df.iterrows():
+    play_tb = {}
+    
+    desc = play['Detail']
+    play_tb['playid'] = play.playid
+    
+    # Penalty
+    if ' Penalty ' and '(no play)' in desc:
+        play_tb['penalty'] = 1
+        continue 
+        
+    elif 'Penalty ' in desc:
+        result = re.search(', \S+ yards ', desc)
+        # [',', '5', 'yards']
+        play_tb['yds'] = result[1]
+        
+        """
+        
+        << Need to determine the direction of the Penalty >>
+        
+        """
+        
     
     # Passing Plays
-    if play['Detail'] == ' pass ':
-        play['pos'] = 'pass'
-
+    passing = {}
+    
+    if ' pass ' in desc:
+        passing['playid'] = play.playid
+        passing['passer'] = desc.split(' pass ')[0]
+        
+        if ' challenged ' in desc:
+            
+            """
+            NOT SURE WHAT TO DO HERE
+            
+            """
+        
+        # pass successful?
+        if ' complete ' in desc:
+            passing['succ'] = 1
+            
+            result = re.search('complete \S+ \S+ to \S+ \S+ for \S+ ', desc)
+            #['complete', 'deep', 'left', 'to', 'Julio', 'Jones', 'for', '33']
+            result = result.group(0).split()
+            passing['DIST'] = result[1]   # passing Distance
+            passing['LOC'] = result[2]   # passing location
+            passing['target'] = result[4] + ' ' + result[5]   # passing target
+            passing['yds'] = result[7]  # yards gained
+            
+        # incomplete passes
+        else:
+            passing['succ'] = 0
+            if 'intended for' in desc:
+                result = re.search('incomplete \S+ \S+ intended for \S+ \S+', desc)
+                
+                if result is None: 
+                    continue; # ball thrown away
+                
+                result = result.group(0).split()
+                # ['incomplete', 'short', 'left', 'intended', 'for', 'Julio', 'Jones']
+                passing['DIST'] = result[1]   # passing Distance
+                passing['LOC'] = result[2]   # passing location
+                passing['target'] = result[5] + ' ' + result[6]   # passing target
+                passing['yds'] = 0
+    
+    passing_features.append(passing) 
 
 
