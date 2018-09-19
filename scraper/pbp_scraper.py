@@ -100,3 +100,15 @@ for i in range(len(drives)):
            (df.Time!=''), 'pos'] = drives.pos[i]
 
 # add new features for adjustment on time 
+        #    WIP    #
+    
+
+# Feature Development
+for i,play in df.iterrows():
+    
+    # Passing Plays
+    if play['Detail'] == ' pass ':
+        play['pos'] = 'pass'
+
+
+
