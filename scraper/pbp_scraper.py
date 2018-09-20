@@ -174,4 +174,18 @@ for i,play in df.iterrows():
     
     passing_features.append(passing) 
 
+    
+## Passing Data Table
+running_features = []
+
+for i,play in df.iterrows():
+    # Running Plays
+    running = {}
+    
+    if ' run ' in desc:
+        running['playid'] = play.playid
+        running['runner'] = desc.split(' run ')[0]
+    
+    
+    running_features.append(running) 
 
