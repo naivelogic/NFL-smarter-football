@@ -203,7 +203,6 @@ for i,play in df[(df.Detail.str.contains('no play'))].iterrows():
     penalty['pid'] = play.playid
     penalty['play_type'] = 'no play'
     penalty['PlayAttempt'] = 1
-    penalty['yds'] = 
     
     # penalty yards
     result = re.search(', \S+ yards', desc)
@@ -212,24 +211,42 @@ for i,play in df[(df.Detail.str.contains('no play'))].iterrows():
         result = re.search(', \S+ yards, Penalty', desc)
         if result is None:
             continue 
-    
+    result = result.group(0).split()
     penalty['pen_yds'] = result[1]
     
     
     # passing penalty
     if ' pass ' in desc:
+        penalty['passer'] = desc.split(' pass ')[0]
+        penalty['pass_attempt'] = 1
         
-        passing['succ'] = 0
+        # pass successful?
+        if ' complete ' in desc:
+            penalty['pass_succ'] = 1
             
-        if 'intended for' in desc:
-            result = re.search('incomplete \S+ \S+ intended for \S+ \S+', desc)
-
-            if result is None: 
-                continue # ball thrown away
-
+            result = re.search('complete \S+ \S+ to \S+ \S+ for \S+ ', desc)
+            #['complete', 'deep', 'left', 'to', 'Julio', 'Jones', 'for', '33']
             result = result.group(0).split()
-            # ['incomplete', 'short', 'left', 'intended', 'for', 'Julio', 'Jones']
-            passing['DIST'] = result[1]   # passing Distance
-            passing['LOC'] = result[2]   # passing location
-            passing['target'] = result[5] + ' ' + result[6]   # passing target
-            passing['yds'] = 0
+            penalty['DIST'] = result[1]   # passing Distance
+            penalty['LOC'] = result[2]   # passing location
+            penalty['target'] = result[4] + ' ' + result[5]   # passing target
+            penalty['yds'] = result[7]  # yards gained
+            
+        # incomplete passes
+        elif ' incomplete ' in desc:
+            penalty['succ'] = 0
+            
+            if 'intended for' in desc:
+                result = re.search('incomplete \S+ \S+ intended for \S+ \S+', desc)
+                
+                if result is None: 
+                    continue # ball thrown away
+                
+                result = result.group(0).split()
+                # ['incomplete', 'short', 'left', 'intended', 'for', 'Julio', 'Jones']
+                penalty['DIST'] = result[1]   # passing Distance
+                penalty['LOC'] = result[2]   # passing location
+                penalty['target'] = result[5] + ' ' + result[6]   # passing target
+                penalty['yds'] = 0
+    
+    penalty_features.append(penalty)
