@@ -175,7 +175,7 @@ for i,play in df.iterrows():
     passing_features.append(passing) 
 
     
-## Passing Data Table
+## Running Data Table
 running_features = []
 
 for i,play in df.iterrows():
@@ -189,3 +189,47 @@ for i,play in df.iterrows():
     
     running_features.append(running) 
 
+## Penalty Data Table  
+penalty_features = []
+
+for i,play in df[(df.Detail.str.contains('no play'))].iterrows():
+    #print(play.playid)
+    
+    desc = play['Detail']
+    
+    # Penalty Plays
+    penalty = {}
+    
+    penalty['pid'] = play.playid
+    penalty['play_type'] = 'no play'
+    penalty['PlayAttempt'] = 1
+    penalty['yds'] = 
+    
+    # penalty yards
+    result = re.search(', \S+ yards', desc)
+    
+    if result is None:
+        result = re.search(', \S+ yards, Penalty', desc)
+        if result is None:
+            continue 
+    
+    penalty['pen_yds'] = result[1]
+    
+    
+    # passing penalty
+    if ' pass ' in desc:
+        
+        passing['succ'] = 0
+            
+        if 'intended for' in desc:
+            result = re.search('incomplete \S+ \S+ intended for \S+ \S+', desc)
+
+            if result is None: 
+                continue # ball thrown away
+
+            result = result.group(0).split()
+            # ['incomplete', 'short', 'left', 'intended', 'for', 'Julio', 'Jones']
+            passing['DIST'] = result[1]   # passing Distance
+            passing['LOC'] = result[2]   # passing location
+            passing['target'] = result[5] + ' ' + result[6]   # passing target
+            passing['yds'] = 0
