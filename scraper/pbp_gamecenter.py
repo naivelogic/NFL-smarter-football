@@ -189,3 +189,39 @@ for i in range(len(t)):
                 else:
                     t[i][event] = result
     #                print(event, result, "play_id:", t[i]['play_id'] ,events['playerName'], events['yards'])
+    
+    
+
+"""
+DESCRIPTION MINING
+"""
+import re
+df_list = play_stats_list
+
+for i in range(len(df_list)):
+    play_desc = df_list[i]['desc']
+    
+    
+    
+    # General Offense Stats
+    
+    if ' Shotgun ' in play_desc: df_list[i]['Shotgun'] = 1
+    if ' No Huddle ' in play_desc: df_list[i]['No Huddle'] = 1
+    
+    
+    
+    # Passing Plays
+    if ' pass ' in play_desc:
+        df_list[i]['PlayType'] = 'pass'
+
+        # search for distance and location
+        result = re.search('pass \S+ \S+ \S+ ', play_desc)
+        result = result.group(0).split()    # ['pass', 'incomplete', 'short', 'middle']
+
+        # incomplete passes need to +1 on the result
+        if ' incomplete ' in play_desc:
+            df_list[i]['DIST'] = result[2]   # passing distance
+            df_list[i]['LOC'] = result[3]    # passing location
+        else:
+            df_list[i]['DIST'] = result[1]   # passing distance
+            df_list[i]['LOC'] = result[2]    # passing location
