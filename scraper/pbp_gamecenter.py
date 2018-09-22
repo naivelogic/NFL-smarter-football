@@ -150,3 +150,32 @@ for player_id in player_ids:
     
     player_df.append(player_tb)
     
+t = play_stats_list[:3]
+
+player_name_category = {
+    'passer': ['passing'],
+    'rusher': ['rushing'],
+    'receiver': ['receiving'],
+    'tackler1': ['defense_tkl', 'defense_tkl_primary', 'defense_tkl_loss'],
+    'tackler2':['defense_ast'],
+    'returner':['puntret', 'kickret']
+}
+
+for i in range(len(t)):
+    for pid, stat in t[i]['players'].items():
+        #print(pid)
+        for events in stat:
+            #print(events)
+            dic_events = statmap.values(events['statId'], events['yards'])
+            for event, result in dic_events.items():
+                #t[i][event] = result
+                if event == 'cat':
+                    if dic_events[event] not in ['team', 'punting', 'kicking', 'fumbles', 'penalty']:
+                        #print(dic_events[event])
+                        #if dic_events[event] == 'defense':
+                        temp_ = [i for i in list(dic_events.keys()) if i != 'cat'][0]
+                        for n, r in player_name_category.items():
+                            if temp_ in r: 
+                                t[i][n] = events['playerName']
+                else:
+                    t[i][event] = result
