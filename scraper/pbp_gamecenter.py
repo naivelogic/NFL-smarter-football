@@ -63,20 +63,18 @@ dict_keys(['passing', 'rushing', 'receiving', 'fumbles', 'kicking', 'punting', '
 # ---------------------------------------------------------------------------- #
 
 gamecenter = []
-
+player_df = []
 
 for drive in drives:    
+    play_tb = {}
     plays = list(data[gameid]['drives'][drive]['plays'])
-    
-    print("For drive: {0}, this is the list of plays{1}".format(drive,plays))
-
     
     
     
     cplay = data[gameid]['drives'][drive]['plays']
     for play in plays:
-        play_tb = {}
-
+        
+        
         play_tb['gameid'] = gameid
         play_tb['playid'] = play
         play_tb['drive'] = drive
@@ -85,9 +83,41 @@ for drive in drives:
         play_tb['time'] = cplay[play]['time']
         play_tb['yrdln'] = cplay[play]['yrdln']
         play_tb['ydstogo'] = cplay[play]['ydstogo']
+        play_tb['posteam'] = cplay[play]['posteam']
         play_tb['desc'] = cplay[play]['desc']
+        play_tb['sp'] = cplay[play]['sp']
+        play_tb['note'] = cplay[play]['note']
+        
 
-    gamecenter.append(play_tb)
+        gamecenter.append(play_tb)
+        
+        
+        player_tb = {}
+        player_ids = list(cplay[play]['players'].keys())
+
+        players_play = cplay[play]['players']
+
+        for player_id in player_ids:
+            for p in range(len(players_play[player_id])):
+            
+                player_tb['gameid'] = gameid
+                player_tb['playid'] = play
+                player_tb['playerName'] = players_play[player_id][p]['playerName']
+                player_tb['playerID'] = player_id
+                player_tb['yards'] = players_play[player_id][p]['yards']
+                
+                for info in players_play[player_ids[p]]:
+                    if info['statId'] not in statmap.idmap: continue
+                    statvals = statmap.values(info['statId'], info['yards'])
+
+                    for k, v in enumerate(statvals):
+                        print(v, statvals[v])
+                        player_tb['action'] = v
+                        player_tb['result'] = statvals[v]
+
+
+                player_df.append(player_tb)
+            
 
 print(pd.DataFrame(gamecenter))
 
