@@ -162,7 +162,9 @@ player_name_category = {
 }
 
 for i in range(len(t)):
+    
     for pid, stat in t[i]['players'].items():
+
         #print(pid)
         for events in stat:
             #print(events)
@@ -170,12 +172,20 @@ for i in range(len(t)):
             for event, result in dic_events.items():
                 #t[i][event] = result
                 if event == 'cat':
-                    if dic_events[event] not in ['team', 'punting', 'kicking', 'fumbles', 'penalty']:
+                    if result not in ['team', 'punting', 'kicking', 'fumbles', 'penalty']:
                         #print(dic_events[event])
-                        #if dic_events[event] == 'defense':
-                        temp_ = [i for i in list(dic_events.keys()) if i != 'cat'][0]
-                        for n, r in player_name_category.items():
-                            if temp_ in r: 
-                                t[i][n] = events['playerName']
+                        if result == 'defense':
+                            temp_ = [i for i in list(dic_events.keys()) if i != 'cat'][0]
+                            for n, r in player_name_category.items():
+                                if temp_ in r: 
+                                    t[i][n] = events['playerName']
+                        elif result in list(player_name_category.values()):
+                            result_cat = list(player_name_category.keys())[list(player_name_category.values()).index(result)]
+                            t[i][result_cat] = events['playerName']
+                        else:
+                            t[i][result] = events['playerName']
+
+
                 else:
                     t[i][event] = result
+    #                print(event, result, "play_id:", t[i]['play_id'] ,events['playerName'], events['yards'])
