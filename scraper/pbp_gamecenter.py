@@ -130,3 +130,23 @@ print(cplay['37']['players'].keys())
 dict_keys(['00-0030968', '00-0030465', '00-0028660'])
 """
 print(cplay['37']['players']['00-0028660'])
+
+
+### Players DF
+player_df = []
+player_tb = {}
+player_ids = list(cplay[play]['players'].keys())
+
+players_play = cplay[play]['players']
+
+for player_id in player_ids:
+    
+    player_tb['gameid'] = gameid
+    player_tb['playid'] = play
+    player_tb['playerName'] = players_play[player_id]['playerName']
+    player_tb['playerID'] = player_id
+    player_tb['yards'] = players_play[player_id]['yards']
+    
+    
+    player_df.append(player_tb)
+    
