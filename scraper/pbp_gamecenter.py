@@ -7,36 +7,25 @@ with open('./2017123108.json', 'r') as f:
 
 ### TODO: Develop script to get listing of Games by week 
 """
-
 """
-
 gameid = '2017123108'
-
 """
-
 ## data[gameid]
 
 dict_keys(['home', 'away', 'drives', 'scrsummary', 'weather', 'media', 
 'yl', 'qtr', 'note', 'down', 'togo', 'redzone', 'clock', 'posteam', 'stadium'])
-
 """
 
 # Drives
 #drives = list(data[gameid]['drives'])[:-1]
 drives = list(data[gameid]['drives'])[0]
 
-
-print("\n")
-
-
 """
 data[gameid]['away']['stats'].keys())
-
 dict_keys(['passing', 'rushing', 'receiving', 'fumbles', 'kicking', 'punting', 'kickret
 """
 
 # Plays IDs
-
 #for drive in driveids:
 #    print(data[gameid]['drives'][drive]['plays'])
 
@@ -122,16 +111,7 @@ for drive in drives:
 print(pd.DataFrame(gamecenter))
 
 
-print(cplay['37'].keys())
-
-# players
-print(cplay['37']['players'].keys())
-"""
-dict_keys(['00-0030968', '00-0030465', '00-0028660'])
-"""
-print(cplay['37']['players']['00-0028660'])
-
-
+#################################################################################
 ### Players DF
 player_df = []
 player_tb = {}
@@ -189,7 +169,9 @@ for i in range(len(t)):
                 else:
                     t[i][event] = result
     #                print(event, result, "play_id:", t[i]['play_id'] ,events['playerName'], events['yards'])
-    
+
+####################################################################################################################################
+# Description Mining
 import numpy as np
 df_list = play_stats_list
 
@@ -252,4 +234,22 @@ for i in range(len(df_list)):
         if direction_re.search(play_desc):
             df_list[i]['LOC'] = direction_re.search(play_desc)[0]   # running location
     
+    # Include Appropriate `Yards Gained` based off of penalty
+    if df_list[i]['note'] == 'PENALTY':
+        result = re.search(" for \S+ yards", play_desc)
+        if result is None: 
+                    continue; # no added yards to penalty
+        result = result.group(0).split()    # ['pass', 'incomplete', 'short', 'middle']
+        df_list[i]['yards_gain'] = int(result[1])
     
+nfl_df = pd.DataFrame(df_list)
+
+######################################################################################################################
+# Create DataFrame Specifically for Passing    
+pass_columns = ['play_id', 'passer', 'receiver', 'yards_gain','DIST','LOC','passing_tds' ,'passing_yds','passing_att',
+                 'passing_cmp','passing_int','passing_cmp_air_yds', 'passing_int', 'passing_first_down']
+pass_ = nfl_df[nfl_df.PlayType=='pass'][pass_columns]
+[pass_[i].fillna(0, inplace=True) for i in pass_.columns]
+#pass_.to_csv('pass_.csv')
+pass_.head()
+
