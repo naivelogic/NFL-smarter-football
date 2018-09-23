@@ -190,24 +190,41 @@ for i in range(len(t)):
                     t[i][event] = result
     #                print(event, result, "play_id:", t[i]['play_id'] ,events['playerName'], events['yards'])
     
-    
+import numpy as np
+df_list = play_stats_list
 
+# run play direction
+direction = ['middle', 'left end', 'right end', 'left tackle', 'right tackle',
+            'left guard', 'right guard']
+
+# invese the quarter numbers in order to calculate the 'Time in Seconds' in the total game
+inverse_qtr = [1, 4, 3, 2, 1, 1]
 """
 DESCRIPTION MINING
 """
-import re
-df_list = play_stats_list
-
 for i in range(len(df_list)):
     play_desc = df_list[i]['desc']
-    
-    
-    
+
     # General Offense Stats
     
     if ' Shotgun ' in play_desc: df_list[i]['Shotgun'] = 1
     if ' No Huddle ' in play_desc: df_list[i]['No Huddle'] = 1
+        
+    ## Time Features
+    """
+    We created a list called `inverse_qtr` which we use to multiply agains tthe 
+    total seconds of the clock in the game. This provides us a view of the 
+    Seconds Elapsed throughout the game
+    """
+    df_list[i]['TimeSec'] = (float(df_list[i]['time'].minute) * 60 + float(df_list[i]['time'].second)) * inverse_qtr[df_list[i]['qtr']]  
+    df_list[i]['SecLeftinHalf'] = float(df_list[i]['TimeSec']) * df_list[i]['TimeSec']
+    df_list[i]['Last3mins'] = df_list[i]['SecLeftinHalf'] >= 1620
     
+    # is it First Half or Second Half
+    if df_list[i]['qtr'] <=2:
+        df_list[i]['half'] = 1
+    else:
+        df_list[i]['half'] = 2
     
     
     # Passing Plays
@@ -225,3 +242,14 @@ for i in range(len(df_list)):
         else:
             df_list[i]['DIST'] = result[1]   # passing distance
             df_list[i]['LOC'] = result[2]    # passing location
+
+
+    # Running Plays
+    if 'rushing_att' in list(df_list[i].keys()):
+        df_list[i]['PlayType'] = 'run'
+        
+        # find direction of run play
+        if direction_re.search(play_desc):
+            df_list[i]['LOC'] = direction_re.search(play_desc)[0]   # running location
+    
+    
