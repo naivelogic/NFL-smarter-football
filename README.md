@@ -21,3 +21,19 @@ Most related to NFL Play-by-Play (pbp) 2012 - 2017 season is from [nflscraoR-dat
 
 
 __Point to remember about causality:__ One law of data science to keep top of mind: correlation does not imply causation. This is a common statistical phases used to emphasize that a correlation between two variables does not imply that one causes the other.
+
+## Core Features
+=========
+* Team
+* Opponent
+* Quarter
+* Time
+* Field position
+* Down
+* Yards to go
+* Shotgun formation (0/1)
+* PlayType: pass / run / kickoff/ penalty / punt/ fumble / int / timeout / extra point / field goal
+* PlayDirection
+  -> Pass: left / middle / right
+  -> Run: left end / left tackle / left guard / middle / right guard / right tackle / right end
+* PassDistance (short / deep)
