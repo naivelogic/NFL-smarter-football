@@ -253,3 +253,11 @@ pass_ = nfl_df[nfl_df.PlayType=='pass'][pass_columns]
 #pass_.to_csv('pass_.csv')
 pass_.head()
 
+#####################################################################################################################
+# Create DataFrame Specifically for Rushing    
+run_columns = ['play_id', 'passer', 'receiver', 'yards_gain','DIST','LOC','rushing_tds' ,'rushing_yds','rushing_att',
+               'rushing_first_down']
+run_ = nfl_df[nfl_df.PlayType=='run'][run_columns]
+[run_[i].fillna(0, inplace=True) for i in run_.columns]
+#run_.to_csv('run_.csv')
+run_.head()
