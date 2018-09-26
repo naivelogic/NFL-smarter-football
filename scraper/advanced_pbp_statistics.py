@@ -57,3 +57,33 @@ qb_rating['intpa'] = qb_rating.intpa.apply(lambda x: pass_rate_quality_check(x))
 qb_rating['pass_rate'] = ((qb_rating['cmp'] + qb_rating['ypa'] + qb_rating['tdpa'] + qb_rating['intpa']) / 6) * 100
 
 print(qb_rating)
+
+#####
+"""
+Cumlative Passing Features
+
+May need to consider the implications of doing a cummsum metrics on the current play, as it would 
+indicate the result of the play not the prior. May need to consider shifting down stats afterwards.
+"""
+
+pass_['passing_att_cum'] = (pass_.groupby(['passer'])['passing_att'].cumsum())
+pass_['passing_cmp_cum'] = (pass_.groupby(['passer'])['passing_cmp'].cumsum())
+pass_['passing_int_cum'] = (pass_.groupby(['passer'])['passing_int'].cumsum())
+pass_['passing_tds_cum'] = (pass_.groupby(['passer'])['passing_tds'].cumsum())
+pass_['passing_yds_cum'] = (pass_.groupby(['passer'])['passing_yds'].cumsum())
+
+pass_['cmp_cum'] = ((pass_.passing_cmp_cum / pass_.passing_att_cum) - .3) * 5           # completion percentage
+pass_['ypa_cum'] = ((pass_.passing_yds_cum / pass_.passing_att_cum) - 3) * .25          # yards per attempt
+pass_['tdpa_cum'] = (pass_.passing_tds_cum / pass_.passing_att_cum) * 20                # touchdowns per attempt 
+pass_['intpa_cum'] = 2.375 - ((pass_.passing_int_cum / pass_.passing_att_cum) * 25)     # interceptions per attempt 
+
+pass_['cmp_q'] = pass_.cmp_cum.apply(lambda x: pass_rate_quality_check(x))
+pass_['ypa_q'] = pass_.ypa_cum.apply(lambda x: pass_rate_quality_check(x))
+pass_['tdpa_q'] = pass_.tdpa_cum.apply(lambda x: pass_rate_quality_check(x))
+pass_['intpa_q'] = pass_.intpa_cum.apply(lambda x: pass_rate_quality_check(x))
+
+# Passer Rating
+
+pass_['pass_rate_cum'] = ((pass_['cmp_q'] + pass_['ypa_q'] + pass_['tdpa_q'] + pass_['intpa_q']) / 6) * 100
+
+pass_.drop(['cmp_cum', 'ypa_cum', 'tdpa_cum', 'intpa_cum','cmp_q','ypa_q','tdpa_q','intpa_q'], axis=1, inplace=True)
