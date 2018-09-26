@@ -231,8 +231,12 @@ for i in range(len(df_list)):
         df_list[i]['PlayType'] = 'run'
         
         # find direction of run play
-        if direction_re.search(play_desc):
-            df_list[i]['LOC'] = direction_re.search(play_desc)[0]   # running location
+        for s in direction:
+            if s in play_desc:
+                df_list[i]['LOC'] = s
+            else: continue 
+        #if direction_re.search(play_desc):
+        #    df_list[i]['LOC'] = direction_re.search(play_desc)[0]   # running location
     
     # Include Appropriate `Yards Gained` based off of penalty
     if df_list[i]['note'] == 'PENALTY':
