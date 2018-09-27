@@ -63,6 +63,7 @@ print(qb_rating)
 Here is the new function for qb_rating
 """
 def qb_rating(cmp = 0, att = 0, yds = 0, tds = 0, intpa = 0):
+    if att == 0: return 0
     cmp_ = ((cmp / att) - .3) * 5
     ypa_ = ((yds / att) - 3) * .25
     tdpa_ = ((tds / att) *20)
