@@ -62,12 +62,12 @@ print(qb_rating)
 """
 Here is the new function for qb_rating
 """
-def qb_rating(cmp = 0, att = 0, yds = 0, tds = 0, intpa = 0):
-    if att == 0: return 0
-    cmp_ = ((cmp / att) - .3) * 5
-    ypa_ = ((yds / att) - 3) * .25
-    tdpa_ = ((tds / att) *20)
-    intpa_ = 2.375 - ((intpa / att) * 25)
+def qb_rating(row):    
+    if row.PassAttempt == 0: return 0
+    cmp_ = ((row.PassComplete / row.PassAttempt) - .3) * 5
+    ypa_ = ((row['Yards.Gained'] / row.PassAttempt) - 3) * .25
+    tdpa_ = ((row.Touchdown / row.PassAttempt) *20)
+    intpa_ = 2.375 - ((row.InterceptionThrown / row.PassAttempt) * 25)
     
     cmp_ = pass_rate_quality_check(cmp_)
     ypa_ = pass_rate_quality_check(ypa_)
@@ -78,7 +78,7 @@ def qb_rating(cmp = 0, att = 0, yds = 0, tds = 0, intpa = 0):
     
     return rating 
 
-# qb_rating(cmp = 19, att = 34, yds = 251, tds=0, intpa = 1)
+# nfl['qb_rating'] = nfl.apply(qb_rating, axis=1)
 
 #####
 """
