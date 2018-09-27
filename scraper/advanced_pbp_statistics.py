@@ -58,6 +58,27 @@ qb_rating['pass_rate'] = ((qb_rating['cmp'] + qb_rating['ypa'] + qb_rating['tdpa
 
 print(qb_rating)
 
+############################################################
+"""
+Here is the new function for qb_rating
+"""
+def qb_rating(cmp = 0, att = 0, yds = 0, tds = 0, intpa = 0):
+    cmp_ = ((cmp / att) - .3) * 5
+    ypa_ = ((yds / att) - 3) * .25
+    tdpa_ = ((tds / att) *20)
+    intpa_ = 2.375 - ((intpa / att) * 25)
+    
+    cmp_ = pass_rate_quality_check(cmp_)
+    ypa_ = pass_rate_quality_check(ypa_)
+    tdpa_ = pass_rate_quality_check(tdpa_)
+    intpa_ = pass_rate_quality_check(intpa_)
+    
+    rating = ((cmp_ + ypa_ + tdpa_ + intpa_) / 6 )* 100
+    
+    return rating 
+
+# qb_rating(cmp = 19, att = 34, yds = 251, tds=0, intpa = 1)
+
 #####
 """
 Cumlative Passing Features
