@@ -25,14 +25,6 @@ data[gameid]['away']['stats'].keys())
 dict_keys(['passing', 'rushing', 'receiving', 'fumbles', 'kicking', 'punting', 'kickret
 """
 
-# Plays IDs
-#for drive in driveids:
-#    print(data[gameid]['drives'][drive]['plays'])
-
-#print(data[gameid]['drives'][drives[0]]['plays'].keys())
-
-#print(data[gameid]['drives'][drives[0]]['plays']['37'])
-
 
 # ---------------------------------------------------------------------------- #
 #   Extract game data with given eid
