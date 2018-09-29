@@ -230,16 +230,38 @@ for i in range(len(df_list)):
         #if direction_re.search(play_desc):
         #    df_list[i]['LOC'] = direction_re.search(play_desc)[0]   # running location
     
+    # other play types
+    play_notes = df_list[i]['note']
+    if 'kneel' in play_desc: df_list[i]['PlayType'] = 'qb_kneel'
+    elif 'Two-Minute Warning' in play_desc: df_list[i]['PlayType'] = 'NA'
+    elif 'END ' in play_desc: df_list[i]['PlayType'] = 'NA'
+    elif 'sacked ' in play_desc: df_list[i]['PlayType'] = 'pass'
+    elif 'No Play' in play_desc: df_list[i]['PlayType'] = 'no_play'
+        
+    elif play_notes == 'KICKOFF': df_list[i]['PlayType'] = 'kickoff'
+    elif play_notes == 'TIMEOUT': df_list[i]['PlayType'] = 'no_play'
+    elif play_notes == 'FGM': df_list[i]['PlayType'] = 'field_goal'
+    elif play_notes == 'FG': df_list[i]['PlayType'] = 'field_goal'
+    elif play_notes == '2PR': df_list[i]['PlayType'] = 'run'
+    elif play_notes == 'XP': df_list[i]['PlayType'] = 'extra_point'
+    elif play_notes == 'PUNT': df_list[i]['PlayType'] = 'punt'
+    
+    
     # Include Appropriate `Yards Gained` based off of penalty
     if df_list[i]['note'] == 'PENALTY':
         result = re.search(" for \S+ yards", play_desc)
         if result is None: 
-                    continue; # no added yards to penalty
+            df_list[i]['PlayType'] = 'no_play'
+            continue; # no added yards to penalty
         result = result.group(0).split()    # ['pass', 'incomplete', 'short', 'middle']
         df_list[i]['yards_gain'] = int(result[1])
     
 nfl_df = pd.DataFrame(df_list)
 
+# if doing this for just a single game, some games dont have interceptions so 
+# we may have to check for that manually and create zeros
+if 'passing_int' not in list(df.columns):
+    df['passing_int'] = 0
 
 ################################################################################################
 # Creating the Scoring System
