@@ -1,6 +1,30 @@
 import pandas as pd
 import json
 
+#############################################################
+# Importing new data for the week
+
+def grab_game_data(year, week):
+    url = 'http://www.nfl.com/schedules/{}/REG{}'.format(year, week)
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    
+    gameids = []
+    for tb in soup.find_all(class_="schedules-list-content post expandable type-reg pro-legacy"):
+        gameids.append(tb['data-gameid'])
+    for tb in soup.find_all(class_="schedules-list-content post expandable primetime type-reg pro-legacy"):
+        gameids.append(tb['data-gameid'])
+        
+    print(gameids)
+    
+    for gid in gameids:
+        urls = ['http://www.nfl.com/liveupdate/game-center/2018090906/2018090906_gtd.json']
+
+    return soup
+
+soup = grab_data(2018, 1)
+soup
+
 
 with open('./2017123108.json', 'r') as f:
     data = json.load(f)
