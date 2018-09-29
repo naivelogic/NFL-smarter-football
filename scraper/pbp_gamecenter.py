@@ -240,6 +240,61 @@ for i in range(len(df_list)):
     
 nfl_df = pd.DataFrame(df_list)
 
+
+################################################################################################
+# Creating the Scoring System
+"""
+from the notes column in the dataframe here are the key notes that indicates a score (in defferent of possession or defensive socre):
+        `['TD', 'XP', 'FG', '2PR','FGM', '2PS' ]`. 
+To identfy defensive score we use `defense_tds = 1`
+"""
+import numpy as np
+# Team Indications 
+away_abbr = str(game_data_dict['away']['abbr'])
+home_abbr = str(game_data_dict['home']['abbr'])
+
+
+# home team and away team indication
+df['home_team'] = home_abbr
+df['away_team'] = away_abbr
+
+# defensive team indication
+df['defteam'] = np.where(df.posteam == home_abbr, away_abbr, home_abbr)
+
+
+df['posteam_score'] = 0
+df['defteam_score'] = 0
+df.loc[df.note == 'TD', 'posteam_score'] = 6
+df.loc[(df.note == 'XP') & (df.desc.str.contains('GOOD')), 'posteam_score'] = 1
+df.loc[(df.note == 'FG') & (df.desc.str.contains('GOOD')), 'posteam_score'] = 3
+df.loc[(df.note == '2PR') & (df.desc.str.contains('SUCCEEDS')), 'posteam_score'] = 2
+df.loc[(df.note == '2PS') & (df.desc.str.contains('SUCCEEDS')), 'posteam_score'] = 2
+
+# scknoledge defense team score and remove from possession team
+df.loc[df.defense_tds ==1, 'defteam_score' ] = 7 # defensive TD
+df.loc[df.defense_tds ==1, 'posteam_score' ] = 0 # defensive TD
+
+# set home and away team score
+df['home_team_score'] = df[(df.posteam==home_abbr)].posteam_score
+df['away_team_score'] = df[(df.posteam==away_abbr)].posteam_score
+df.loc[(df.defense_tds ==1) & (df.defteam==home_abbr), 'home_team_score' ] = 7 # defensive TD
+df.loc[(df.defense_tds ==1) & (df.defteam==away_abbr), 'away_team_score' ] = 7 # defensive TD
+
+# cumulative sum for home and away scores
+df['home_team_score']  = df.home_team_score.cumsum()
+df['away_team_score']  = df.away_team_score.cumsum()
+
+# differnece in score
+df['score_diff'] = df.home_team_score - df.away_team_score
+
+
+
+
+
+
+
+
+
 ######################################################################################################################
 # Create DataFrame Specifically for Passing    
 pass_columns = ['play_id', 'passer', 'receiver', 'yards_gain','DIST','LOC','passing_tds' ,'passing_yds','passing_att',
