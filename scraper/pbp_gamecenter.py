@@ -3,7 +3,9 @@ import json
 
 #############################################################
 # Importing new data for the week
-
+"""
+Note: Work in Progress
+"""
 def grab_game_data(year, week):
     url = 'http://www.nfl.com/schedules/{}/REG{}'.format(year, week)
     r = requests.get(url)
@@ -26,6 +28,13 @@ soup = grab_data(2018, 1)
 soup
 
 
+
+#############################################################
+# Manual import of NFL Json File (the above script will replace this manual process)
+"""
+Note: Work in Progress
+"""
+
 with open('./2017123108.json', 'r') as f:
     data = json.load(f)
 
@@ -40,6 +49,8 @@ dict_keys(['home', 'away', 'drives', 'scrsummary', 'weather', 'media',
 'yl', 'qtr', 'note', 'down', 'togo', 'redzone', 'clock', 'posteam', 'stadium'])
 """
 
+
+####################################################################
 # Drives
 #drives = list(data[gameid]['drives'])[:-1]
 drives = list(data[gameid]['drives'])[0]
