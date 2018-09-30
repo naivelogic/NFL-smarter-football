@@ -369,3 +369,36 @@ run_ = nfl_df[nfl_df.PlayType=='run'][run_columns]
 [run_[i].fillna(0, inplace=True) for i in run_.columns]
 #run_.to_csv('run_.csv')
 run_.head()
+
+#######################################################################################################################
+# Create indication of week # during season
+import datetime
+def game_weeks(df):
+    """
+    Create dataset indicate the game week. 
+    """
+    
+    week_dict = {}
+    first_game_date = df.min().date()
+    game_date = first_game_date
+    season_start_date = pd.to_datetime('2018-09-04 00:00:00').date()
+    last_game_date = df.max().date()
+    week_num = 1 # start week 1 and increment from there
+    
+    for i in range((last_game_date - first_game_date).days+1):
+        if game_date <= season_start_date:
+            week_dict[game_date] = 0
+            game_date += datetime.timedelta(days=1)
+        else:
+            if game_date.weekday() == 1: # check if weekday is Tuesday.. if so reset week_number
+                week_num += 1
+            week_dict[game_date] = week_num
+            game_date += datetime.timedelta(days=1)
+    
+    week_list = pd.Series(week_dict).to_frame()[0]
+    
+    return week_list
+
+d = game_weeks(pd.to_datetime(nfl.game_date))
+for o,j in enumerate(d.index):
+    nfl.loc[nfl.game_date == str(j), 'week'] = d[o]
