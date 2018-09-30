@@ -46,7 +46,7 @@ nfl_news_stopwords = ['game', 'team', 'season', 'year', 'like', 'time', 'just', 
                         'rd', 'isnt', 'play','player']
 
 
-
+import datetime
 def game_weeks(df):
     """
     Create dataset indicate the game week. 
