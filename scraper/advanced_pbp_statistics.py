@@ -109,3 +109,56 @@ pass_['intpa_q'] = pass_.intpa_cum.apply(lambda x: pass_rate_quality_check(x))
 pass_['pass_rate_cum'] = ((pass_['cmp_q'] + pass_['ypa_q'] + pass_['tdpa_q'] + pass_['intpa_q']) / 6) * 100
 
 pass_.drop(['cmp_cum', 'ypa_cum', 'tdpa_cum', 'intpa_cum','cmp_q','ypa_q','tdpa_q','intpa_q'], axis=1, inplace=True)
+
+
+
+############################################################################################################################
+# Success Rate Calculation [WORK IN PROGRESS]
+
+"""
+Per [Football Outsiders](http://www.footballoutsiders.com/stat-analysis/2004/introducing-running-back-success-rate), a run is 
+considered a success if it satisfies the following benchmarks:
+
+    1. Gains 40% of yards needed on first down, 60% of yards needed on second down, or 100% of yards needed on third down
+
+    2. If the offense is behind by more than a touchdown in the fourth quarter, the first/second/third down benchmarks change 
+    to 50%/65%/100%, respectively.
+
+    3. If the offense is ahead by any amount in the fourth quarter, the first/second/third down benchmarks change to 30%/50%/100%, 
+    respectively.
+"""
+
+def success_rate_cal(play):
+    qtr = int(play.qtr)
+    down = int(play.down)
+    togo = int(play.ydstogo)
+    first = int(play.first_down)
+    att = int(play.play_attempt)
+    yds = int(play.yards_gained)
+    
+    result = yds / att
+    yards_obtained = yds / togo
+
+    
+    #if (play.down == 3) & (play.first_down == 0):
+        # if play resulted in 4th down (unsuccessful attempt at 1st down)
+     #   return 0 
+    
+    if down == 1:
+        return 1
+    
+    elif down == 1:
+        if yards_obtained >= .40:
+            return yards_obtained
+        
+    elif down == 2:
+        if yards_obtained >= .60:
+            return yards_obtained
+    
+    elif down >= 3:
+        if yards_obtained >= 1:
+            return yards_obtained
+    
+    return down
+
+#success_rate_cal(test_play)
