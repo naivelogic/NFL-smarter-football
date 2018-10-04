@@ -162,3 +162,27 @@ def success_rate_cal(play):
     return down
 
 #success_rate_cal(test_play)
+
+
+##############
+# Missed and Above Yards on (un)/Successful plays
+
+def yards_success_plays(play):
+   """
+   source: https://www.sharpfootballstats.com/player-success-metrics---passing--off-.html
+   """
+    if play.ydstogo == 0:
+        return 0
+    
+    if play.down == 1:
+        x = .4
+    elif play.down == 2:
+        x = .6
+    elif play.down >= 3:
+        x = 1
+    
+    result = ((play.yards_gained / play.ydstogo) * play.ydstogo) - (test_play.ydstogo * x)
+    
+    return result
+# nfl['missed_ypa'] = nfl[(nfl.success_play == 0)].apply(successful_play_yards, axis=1)
+# nfl['above_success_play_yrd'] = nfl[(nfl.success_play == 1)].apply(successful_play_yards, axis=1)
