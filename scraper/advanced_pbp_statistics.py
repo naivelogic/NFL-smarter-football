@@ -128,38 +128,86 @@ considered a success if it satisfies the following benchmarks:
     respectively.
 """
 
-def success_rate_cal(play):
-    qtr = int(play.qtr)
-    down = int(play.down)
-    togo = int(play.ydstogo)
-    first = int(play.first_down)
-    att = int(play.play_attempt)
-    yds = int(play.yards_gained)
+def success_rate_cal(play):    
+    """
+    [TODO: Further Analsyis Needed] Unsure what to do on Two Point Conversions
+    """
+    if play.ydstogo == 0:
+        return 0
     
-    result = yds / att
-    yards_obtained = yds / togo
+    yards_obtained = play.yards_gained / play.ydstogo
 
-    
-    #if (play.down == 3) & (play.first_down == 0):
-        # if play resulted in 4th down (unsuccessful attempt at 1st down)
-     #   return 0 
-    
-    if down == 1:
+    if play.first == 1:
         return 1
     
-    elif down == 1:
-        if yards_obtained >= .40:
-            return yards_obtained
+    # check if play is if the fourth quarter
+    elif play.qtr == 4:
         
-    elif down == 2:
-        if yards_obtained >= .60:
-            return yards_obtained
-    
-    elif down >= 3:
-        if yards_obtained >= 1:
-            return yards_obtained
-    
-    return down
+        # check if offense is down by more than a TD
+        if play.score_differential >= -7:
+            if play.down == 1:
+                if yards_obtained >= .50:
+                    return 1
+                else: return 0
+
+            elif play.down == 2:
+                if yards_obtained >= .65:
+                    return 1
+                else: return 0
+
+            elif play.down >= 3:
+                if yards_obtained >= 1:
+                    return 1
+                else: return 0
+                
+                
+        # check if offense is down by more than a TD
+        elif play.score_differential > 0:
+            if play.down == 1:
+                if yards_obtained >= .30:
+                    return 1
+                else: return 0
+
+            elif play.down == 2:
+                if yards_obtained >= .50:
+                    return 1
+                else: return 0
+
+            elif play.down >= 3:
+                if yards_obtained >= 1:
+                    return 1
+                else: return 0
+        else:
+            if play.down == 1:
+                if yards_obtained >= .40:
+                    return 1
+                else: return 0
+
+            elif play.down == 2:
+                if yards_obtained >= .60:
+                    return 1
+                else: return 0
+
+            elif play.down >= 3:
+                if yards_obtained >= 1:
+                    return 1
+                else: return 0
+            
+    else:
+        if play.down == 1:
+            if yards_obtained >= .40:
+                return 1
+            else: return 0
+
+        elif play.down == 2:
+            if yards_obtained >= .60:
+                return 1
+            else: return 0
+
+        elif play.down >= 3:
+            if yards_obtained >= 1:
+                return 1
+            else: return 0
 
 #success_rate_cal(test_play)
 
