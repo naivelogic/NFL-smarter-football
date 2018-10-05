@@ -2,7 +2,7 @@
 Development of a python scraper to pull articles from NFL Teams News 
 RSS Feeds. This scripts parses the rss feed,and organizes in to the necessary
 fields and saves it to a CSV file. We are working on pulling this directly in
-to a SQLite database. 
+to a SQLite databas.e. 
 
 This code is heavily reliant on Newspaper, here is the documentations:https://newspaper.readthedocs.io/en/latest/
 """
