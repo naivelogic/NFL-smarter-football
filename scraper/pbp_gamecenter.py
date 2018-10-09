@@ -345,13 +345,6 @@ df['away_team_score']  = df.away_team_score.cumsum()
 df['score_diff'] = df.home_team_score - df.away_team_score
 
 
-
-
-
-
-
-
-
 ######################################################################################################################
 # Create DataFrame Specifically for Passing    
 pass_columns = ['play_id', 'passer', 'receiver', 'yards_gain','DIST','LOC','passing_tds' ,'passing_yds','passing_att',
@@ -402,3 +395,4 @@ def game_weeks(df):
 d = game_weeks(pd.to_datetime(nfl.game_date))
 for o,j in enumerate(d.index):
     nfl.loc[nfl.game_date == str(j), 'week'] = d[o]
+#################################################################################
