@@ -9,8 +9,8 @@ In this repository, there is an accumulation of different projects and notebooks
 * NFL Playoff Prediction
 * NFL Play-by-Play Run/Pass Prediction 
 * Walkthroughs of applied machine learning pipelines 
-* NFL News Analysis (Work In Progress)
-* NFL Twitter Analysis (Work In Progress)
+* NFL News Analysis _(Work In Progress)_
+* NFL Twitter Analysis _(Work In Progress)_
 
 ## Introduction
 Months away from the 2019 NFL season, we take a look back on past NFL team season statistics to build a model to predict if a team is playoff bound or not. 
@@ -38,4 +38,4 @@ __Point to remember about causality:__ One law of data science to keep top of mi
   -> Pass: left / middle / right
   -> Run: left end / left tackle / left guard / middle / right guard / right tackle / right end
 * PassDistance (short / deep)
-* Success Measures (Work In Progress)
+* Success Measures _(Work In Progress)_
