@@ -9,7 +9,7 @@ In this repository, there is an accumulation of different projects and notebooks
 * NFL Playoff Prediction
 * NFL Play-by-Play Run/Pass Prediction 
 * Walkthroughs of applied machine learning pipelines 
-* NFL News Analysis _(Work In Progress)_
+* NFL News Analysis _(Work In Progress)_ [repo](https://github.com/naivelogic/NFL-smarter-football/tree/master/NFL%20News%20Analysis)
 * NFL Twitter Analysis _(Work In Progress)_
 
 ## Introduction
