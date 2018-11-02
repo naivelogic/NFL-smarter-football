@@ -10,7 +10,7 @@ In this repository, there is an accumulation of different projects and notebooks
 * NFL Play-by-Play Run/Pass Prediction 
 * Walkthroughs of applied machine learning pipelines 
 * NFL News Analysis _(Work In Progress)_ [repo](https://github.com/naivelogic/NFL-smarter-football/tree/master/NFL%20News%20Analysis)
-* NFL Twitter Analysis _(Work In Progress)_
+* NFL Twitter Analysis [Nike - Kaepernick](https://github.com/naivelogic/NFL-smarter-football/blob/master/Twitter%20Analysis%20on%20Nike's%20Kaepernick%20Endorsement.ipynb)
 
 ## Introduction
 Months away from the 2019 NFL season, we take a look back on past NFL team season statistics to build a model to predict if a team is playoff bound or not. 
