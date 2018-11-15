@@ -26,6 +26,14 @@ For all the articles for the NFL News Analysis, I started scrapping various NFL 
 
 __Point to remember about causality:__ One law of data science to keep top of mind: correlation does not imply causation. This is a common statistical phases used to emphasize that a correlation between two variables does not imply that one causes the other.
 
+#### (In development) Smarter Football - Statistical Inference 
+My latest journey is understanding the intersection of NFL football and statsitical inference. Through the next couple of notebooks, we will look into the methods for providing insights in the how football decisions are made based on data and making predictions. 
+
+_notebooks in development_
+* NFL Birthday Hypothesis Test
+* TBD
+
+
 ## Core Features
 * Team
 * Opponent
