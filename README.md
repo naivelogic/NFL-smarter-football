@@ -30,7 +30,7 @@ __Point to remember about causality:__ One law of data science to keep top of mi
 My latest journey is understanding the intersection of NFL football and statsitical inference. Through the next couple of notebooks, we will look into the methods for providing insights in the how football decisions are made based on data and making predictions. 
 
 _notebooks in development_
-[x] NFL Birthday Hypothesis Test
+- [x] NFL Birthday Hypothesis Test
 * TBD
 
 
