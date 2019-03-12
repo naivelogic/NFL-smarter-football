@@ -31,7 +31,7 @@ My latest journey is understanding the intersection of NFL football and statsiti
 
 _notebooks in development_
 - [x] NFL Birthday Hypothesis Test
-* TBD
+- [ ] NFL News Analysis
 
 
 ## Core Features
