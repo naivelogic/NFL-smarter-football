@@ -5,6 +5,10 @@ fields and saves it to a CSV file. We are working on pulling this directly in
 to a SQLite databas.e. 
 
 This code is heavily reliant on Newspaper, here is the documentations:https://newspaper.readthedocs.io/en/latest/
+
+Make sure to install:
+pip3 install newspaper3k
+nktk
 """
 
 import os
