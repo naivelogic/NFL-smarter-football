@@ -31,7 +31,8 @@ My latest journey is understanding the intersection of NFL football and statsiti
 
 _notebooks in development_
 - [x] NFL Birthday Hypothesis Test
-- [ ] NFL News Analysis
+- [x] NFL News Analysis 2018 [notebook - Sentement Analysis](https://github.com/naivelogic/NFL-smarter-football/blob/master/NFL%20News%20Analysis/Cowboys%20News%20Sentiment%20Analysis.ipynb)
+- [ ] NFL News Analysis 2019  - LSTM and CNN Deep Learning (Tensorflow/Keras, Fastai/Pytorch)
 
 
 ## Core Features
