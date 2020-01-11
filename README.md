@@ -5,6 +5,7 @@ A set of analtyics and machine learning models with the goal of bring intelligen
 ![Smarter Football](https://imagesvc.timeincapp.com/v3/mm/image?url=https%3A%2F%2Fcdn-s3.si.com%2Fs3fs-public%2F2017%2F06%2F27%2Fsmarterfootballlogo.jpg "smarterfootballlogo")
 
 ## Topics Coverage
+
 In this repository, there is an accumulation of different projects and notebooks all task with bring machine learning to the NFL. Some are applied data analytics answering questions such do teams perform better over time with a star runningback (stealers) or should teams adopt a duo time-sharing methdology (falcons)? We consider analysis if teams winning the first quarter more likely to win the game and perform better throughout the season. 
 
 * Running Back Analytics
