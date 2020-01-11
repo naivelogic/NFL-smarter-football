@@ -14,4 +14,18 @@ The detection and tracking pipeline is straight forward:
 - _Step 3:_ a tracking algorithm (Kalman Filter) uses detected object and updates with detection results
 - _Step 4:_ the tracking results are annotated and display on video feed _(TODO:) and archived in database_
 
+## Usage
+
+### Setting Up Environment
+
+1. Get python3 and Anaconda 
+2. Clone Repository
+3. cd to this directory 
+4. _Install required packages_ Create a virtual environment via conda called `nfl`, using `./environment.yml`. This can be achieved by running the command: `conda create --name nfl --file environment.yml`
+5. Get models and put in `./models` folder
+
+run: `python main.py`
+
+
+
 `git push -u origin player-tracking`
