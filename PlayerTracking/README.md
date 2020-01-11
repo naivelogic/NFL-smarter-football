@@ -13,3 +13,5 @@ The detection and tracking pipeline is straight forward:
 - _Step 2:_ the detector localized the object(s) in the real-time
 - _Step 3:_ a tracking algorithm (Kalman Filter) uses detected object and updates with detection results
 - _Step 4:_ the tracking results are annotated and display on video feed _(TODO:) and archived in database_
+
+`git push -u origin player-tracking`

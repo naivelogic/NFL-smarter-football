@@ -1,0 +1,4 @@
+{
+    "git.autofetch": true,
+    "python.dataScience.allowUnauthorizedRemoteConnection": true
+}
