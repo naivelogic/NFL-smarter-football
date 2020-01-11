@@ -6,7 +6,7 @@ A set of analtyics and machine learning models with the goal of bring intelligen
 
 ## Topics Coverage
 
-In this repository, there is an accumulation of different projects and notebooks all task with bring machine learning to the NFL. Some are applied data analytics answering questions such do teams perform better over time with a star runningback (stealers) or should teams adopt a duo time-sharing methdology (falcons)? We consider analysis if teams winning the first quarter more likely to win the game and perform better throughout the season. 
+In this repository, there is an accumulation of different projects and notebooks all task with bring machine learning to the NFL. Some are applied data analytics answering questions such do teams perform better over time with a star runningback (stealers) or should teams adopt a duo time-sharing methdology (falcons)? We consider analysis if teams winning the first quarter more likely to win the game and perform better throughout the season.
 
 * Running Back Analytics
 * NFL Playoff Prediction
