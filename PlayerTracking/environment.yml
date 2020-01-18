@@ -1,0 +1,40 @@
+# conda env export > environment.yml
+# conda env create -f environment.yml
+# conda activate nfl
+# python -m ipykernel install --user --name nfl --display-name "nfl python"
+
+name: nfl
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - cython # wrapping Python around C. C is fast.
+  - h5py # for the ubiquitous HDF5 file format. (h5py==2.7.0)
+  - keras # deep learning library (keras==2.0.2)
+  - keras-applications # pre-trained weights architectures for VGG* ResNet* (keras-applications==1.0.8)
+  - keras-preprocessing # data preprocessing and data augmentation module (keras-preprocessing==1.1.0)
+  - pandas # working with tabulated data  (pandas==0.25.1)
+  - pillow # classic fork of Python Imaging Library (Pillow==6.1.0)
+  - pip # THE python package manager
+  - python==3.7.4
+  - matplotlib>=3.0.1 # classic plotting  (matplotlib==3.1.1)
+  - numpy # essential math and matrix operations (numpy==1.16.5)
+  - scikit-image # image processing https://scikit-image.org/docs/stable/install.html (scikit-image==0.15.0)
+  - scikit-learn  # machine learning
+  - tensorflow # deep learning backend for keras
+  - tensorflow-gpu # deep learning on GPU hardware (tensorflow-gpu==1.12.1)
+  - tqdm # popular progress bar for jupyter
+  #- keras-tqdm # tqdm for keras
+  - scipy # numerical methods (scipy==1.3.1)
+  - jupyter # great tool for any python project.
+  - nb_conda_kernels
+  - ipykernel
+  - pip
+  - pip:
+      - azureml-sdk
+      - docker
+      
+# the `nb_conda_kernels` and `ipykernel` packages are installed so that we
+# can use Jupyter Notebooks with this environment as a kernel
+
+# more enhancements here: https://github.com/microsoft/AKSDeploymentTutorialAML/blob/master/.ci/azure-pipelines.yml
