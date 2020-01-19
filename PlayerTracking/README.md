@@ -21,7 +21,8 @@ The detection and tracking pipeline is straight forward:
 1. Get python3 and Anaconda 
 2. Clone Repository
 3. cd to this directory 
-4. _Install required packages_ Create a virtual environment via conda called `nfl`, using `./environment.yml`. This can be achieved by running the command: `conda env create --name nfl --file environment.yml`
+4. _Install required packages_ Create a virtual environment via conda called `nfl`, using `./environment.yml`. This can be achieved by running the command: `conda create --name nfl --file environment.yml`
+    - `conda install -c anaconda pyyaml`    
 5. Get models and put in `./models` folder
 
 ```commandline

@@ -1,6 +1,6 @@
 # PH modified
 .gitconfig
-notes.md
+PlayerTracking/src/config.yml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
