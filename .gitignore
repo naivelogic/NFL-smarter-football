@@ -1,6 +1,10 @@
 # PH modified
 .gitconfig
+<<<<<<< HEAD
 PlayerTracking/notes.md
+=======
+PlayerTracking/src/config.yml
+>>>>>>> 28958820223f58d9a2d091228a056807da5537f3
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
