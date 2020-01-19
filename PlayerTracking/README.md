@@ -28,11 +28,11 @@ The detection and tracking pipeline is straight forward:
 $ cd ~/NFL-smarter-football/PlayerTracking
 $ conda create env --name nfl --file environment.yml
 $ conda activate nfl
-$ 
+
+# optional for experimenting in Jupyter Notebook
+$ python -m ipykernel install --user --name nfl --display-name "nfl python"
+$ jupyter notebook
 ```
 
+#TODO: not yet ready!!
 run: `python main.py`
-
-
-
-`git push -u origin player-tracking`

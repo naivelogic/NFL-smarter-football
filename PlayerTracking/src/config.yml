@@ -1,0 +1,5 @@
+azureml:
+    subscription_id: 8c33aa69-ad6c-43e3-9551-237155ac6548
+    resource_group: skywalker
+    workspace_name: skywalker
+    tenant_id: 14ea6227-5aad-4a97-8d6f-218fb73c0010
