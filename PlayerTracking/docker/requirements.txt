@@ -1,0 +1,7 @@
+azureml-sdk==1.0.21
+Cython
+contextlib2
+pillow
+lxml
+jupyter
+matplotlib
