@@ -2,7 +2,7 @@
 
 A set of analtyics and machine learning models with the goal of bring intelligence to the NFL. 
 
-![Smarter Football](https://imagesvc.timeincapp.com/v3/mm/image?url=https%3A%2F%2Fcdn-s3.si.com%2Fs3fs-public%2F2017%2F06%2F27%2Fsmarterfootballlogo.jpg "smarterfootballlogo")
+![Smarter Football](./media/smarterfootball.jpg "smarterfootballlogo")
 
 ## Topics Coverage
 
@@ -15,7 +15,7 @@ In this repository, there is an accumulation of different projects and notebooks
 * NFL News Analysis _(Work In Progress)_ [repo](https://github.com/naivelogic/NFL-smarter-football/tree/master/NFL%20News%20Analysis)
 * NFL Twitter Analysis [Nike - Kaepernick](https://github.com/naivelogic/NFL-smarter-football/blob/master/Twitter%20Analysis%20on%20Nike's%20Kaepernick%20Endorsement.ipynb)
 
-![](https://github.com/naivelogic/NFL-smarter-football/blob/master/next%20gen%20stats%20-%20touchdown.gif?raw=true)
+![](https://github.com/naivelogic/NFL-smarter-football/blob/master/media/next%20gen%20stats%20-%20touchdown.gif?raw=true)
 _source: [The Future of Next Gen Stats | NFL NEXT](https://www.youtube.com/watch?v=RXs6G9YBo3c)_
 
 ## Introduction
@@ -57,3 +57,12 @@ _notebooks in development_
   -> Run: left end / left tackle / left guard / middle / right guard / right tackle / right end
 * PassDistance (short / deep)
 * Success Measures _(Work In Progress)_
+
+
+### Theory
+
+A hypothetical model architecture for generating play outcomes given an offense and defense.
+
+![](./media/model_architecture_for_play_outcomes.png)
+
+source: [Michael A. Alcore](https://opensource.com/article/17/9/coaching-football-ai)
